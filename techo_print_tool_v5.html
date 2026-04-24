@@ -160,6 +160,14 @@ button:hover { background: #f5f5f5; }
         <button class="tog" onclick="setSetting('dir','v')">縦書き</button>
       </div>
     </div>
+    <div class="row">
+      <span class="label">配置</span>
+      <div class="tog-group" id="textAlignGroup">
+        <button class="tog active" onclick="setSetting('textAlign','left')">左</button>
+        <button class="tog" onclick="setSetting('textAlign','center')">中央</button>
+        <button class="tog" onclick="setSetting('textAlign','right')">右</button>
+      </div>
+    </div>
     <div class="row" style="align-items:flex-start;">
       <span class="label">テキスト</span>
       <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
@@ -413,7 +421,7 @@ button:hover { background: #f5f5f5; }
 </div>
 
 <script>
-const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
+const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
 let textChunks=[]; // テキストモード用：分割済みチャンク配列
 
 const SIZES = {
@@ -424,8 +432,8 @@ const SIZES = {
     lineH: 16, fontSize: 8, charsPerCard: 120,
     landscape: true,
     positions: [
-      {top:105,left:25},{top:105,left:165},
-      {top:105,left:305},{top:105,left:445}
+      {top:105,left:49},{top:105,left:173},
+      {top:105,left:297},{top:105,left:421}
     ],
     mmW: 62, mmH: 105,
     mmHoleW: 8, mmHoleSize: '3mm', mmHolePad: '5mm',
@@ -441,8 +449,8 @@ const SIZES = {
     lineH: 16, fontSize: 8, charsPerCard: 140,
     landscape: true,
     positions: [
-      {top:76,left:77},{top:76,left:307},
-      {top:220,left:77},{top:220,left:307}
+      {top:86,left:87},{top:86,left:297},
+      {top:210,left:87},{top:210,left:297}
     ],
     mmW: 105, mmH: 62,
     mmHoleW: 7, mmHoleSize: '3mm', mmHolePad: '3mm',
@@ -457,7 +465,7 @@ const SIZES = {
     lineH: 18, fontSize: 9, charsPerCard: 240,
     landscape: false,
     positions: [
-      {top:33,left:40},{top:33,left:220},{top:307,left:40},{top:307,left:220}
+      {top:43,left:50},{top:43,left:210},{top:297,left:50},{top:297,left:210}
     ],
     mmW: 80, mmH: 127, mmHoleW: 10, mmHoleSize: '3.5mm', mmHolePad: '7mm',
     mmLineH: 8, mmLineStart: 12, mmFontSize: '7pt', mmLineHeight: '8mm',
@@ -471,7 +479,7 @@ const SIZES = {
     lineH: 16, fontSize: 9, charsPerCard: 240,
     landscape: true,
     positions: [
-      {top:40,left:33},{top:40,left:307},{top:220,left:33},{top:220,left:307}
+      {top:50,left:43},{top:50,left:297},{top:210,left:43},{top:210,left:297}
     ],
     mmW: 127, mmH: 80, mmHoleW: 10, mmHoleSize: '3.5mm', mmHolePad: '5mm',
     mmLineH: 8, mmLineStart: 12, mmFontSize: '7pt', mmLineHeight: '8mm',
@@ -483,7 +491,7 @@ const SIZES = {
     pw: 190, ph: 342, holeW: 26, holes: 6, holePad: 20, holeSize: 8,
     holeDir: 'left',
     lineH: 20, fontSize: 10, charsPerCard: 320,
-    positions: [{top:18,left:20},{top:18,left:225}],
+    positions: [{top:126,left:20},{top:126,left:210}],
     mmW: 95, mmH: 171, mmHoleW: 13, mmHoleSize: '4mm', mmHolePad: '10mm',
     mmLineH: 9, mmLineStart: 14, mmFontSize: '7.5pt', mmLineHeight: '9mm',
     cardsPerSheet: 2, cols: 2, rows: 1,
@@ -546,7 +554,7 @@ function setMode(mode) {
 
 function setSetting(key, val) {
   state[key]=val;
-  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup'};
+  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',textAlign:'textAlignGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup'};
   const vals={
     size:['micro5v','micro5h','m6v','m6h','bible','a4'],
     dir:['h','v'],
@@ -558,6 +566,7 @@ function setSetting(key, val) {
     habitType:['weekly','circle'],
     weeklyStyle:['horizontal','vertical'],
     calStyle:['simple','grid'],
+    textAlign:['left','center','right'],
     holeAlpha:['0','0.15','0.35','0.6','1'],
     imgAlpha:['0.1','0.25','0.5','1'],
   };
@@ -1509,7 +1518,7 @@ function buildCardPrintHTML(s,data,dataIdxMap,isBack){
         }
       }
       inner=`${imgHtml}<div style="position:absolute;top:${cT}mm;left:${cL}mm;right:0;bottom:0;${bg}"></div>
-        <div style="position:absolute;top:${cT+2}mm;left:${cL+2}mm;right:2mm;bottom:2mm;font-size:${scaledMmFs};color:#222;font-family:${getFF()};font-weight:${getFW()};overflow:hidden;${vs}">${esc(text)}</div>
+        <div style="position:absolute;top:${cT+2}mm;left:${cL+2}mm;right:2mm;bottom:2mm;font-size:${scaledMmFs};color:#222;font-family:${getFF()};font-weight:${getFW()};text-align:${state.textAlign};overflow:hidden;${vs}">${esc(text)}</div>
         <div style="position:absolute;bottom:1mm;right:2mm;font-size:5pt;color:#aaa;font-family:${getFF()};">${di+1}</div>`;
     }
     cards+=`<div style="position:absolute;width:${s.mmW}mm;height:${s.mmH}mm;top:${top}mm;left:${left}mm;overflow:hidden;box-sizing:border-box;background:white;border:0.3pt solid #666;${rot}">${makeHolesMmHTML(s)}${inner}</div>`;
@@ -1602,7 +1611,7 @@ function updatePreview(){
       const sc=parseFloat(state.fontScale);
       const scaledFs=Math.round(s.fontSize*sc);
       const scaledLh=Math.round(s.lineH*sc);
-      txtEl.style.cssText=`position:absolute;top:${bgT+4}px;left:${bgL+4}px;right:4px;bottom:10px;font-size:${scaledFs}px;color:#222;overflow:hidden;line-height:${scaledLh}px;white-space:pre-wrap;word-break:break-all;font-family:${getFF()};font-weight:${getFW()};pointer-events:none;`;
+      txtEl.style.cssText=`position:absolute;top:${bgT+4}px;left:${bgL+4}px;right:4px;bottom:10px;font-size:${scaledFs}px;color:#222;overflow:hidden;line-height:${scaledLh}px;white-space:pre-wrap;word-break:break-all;font-family:${getFF()};font-weight:${getFW()};text-align:${state.textAlign};pointer-events:none;`;
       txtEl.innerHTML=esc(chunkText);
       card.appendChild(txtEl);
       const pn=document.createElement('div');
