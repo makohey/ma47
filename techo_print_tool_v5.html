@@ -334,6 +334,13 @@ button:hover { background: #f5f5f5; }
           <button class="tog" onclick="setSetting('holeAlpha','1')">極濃</button>
         </div>
       </div>
+      <div class="row">
+        <span class="label">裁断ガイド</span>
+        <div class="tog-group" id="cutGuideGroup">
+          <button class="tog active" onclick="setSetting('cutGuide','trim')">トンボ</button>
+          <button class="tog" onclick="setSetting('cutGuide','border')">枠線</button>
+        </div>
+      </div>
     </div>
   </details>
 
@@ -421,7 +428,7 @@ button:hover { background: #f5f5f5; }
 </div>
 
 <script>
-const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
+const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', cutGuide: 'trim', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
 let textChunks=[]; // テキストモード用：分割済みチャンク配列
 
 const SIZES = {
@@ -554,7 +561,7 @@ function setMode(mode) {
 
 function setSetting(key, val) {
   state[key]=val;
-  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',textAlign:'textAlignGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup'};
+  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',textAlign:'textAlignGroup',cutGuide:'cutGuideGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup'};
   const vals={
     size:['micro5v','micro5h','m6v','m6h','bible','a4'],
     dir:['h','v'],
@@ -567,6 +574,7 @@ function setSetting(key, val) {
     weeklyStyle:['horizontal','vertical'],
     calStyle:['simple','grid'],
     textAlign:['left','center','right'],
+    cutGuide:['trim','border'],
     holeAlpha:['0','0.15','0.35','0.6','1'],
     imgAlpha:['0.1','0.25','0.5','1'],
   };
@@ -821,6 +829,7 @@ function getFF(){return state.font==='mincho'?"'Yu Mincho','Hiragino Mincho ProN
 function getFW(){return state.weight==='black'?'900':state.weight==='bold'?'700':'400';}
 function getNumFW(){return state.weight==='black'?'900':state.weight==='bold'?'900':'700';}
 // 線の色（alphaで濃さ制御）
+const _MKHYLM=0x4d4b48594c4d;
 function getLC(){const a=parseFloat(state.lineAlpha);return a<=0?'transparent':`rgba(0,0,0,${a})`;}
 function getLClight(){const a=parseFloat(state.lineAlpha)*0.5;return a<=0?'transparent':`rgba(0,0,0,${a})`;}
 // パンチ穴の色
@@ -846,26 +855,69 @@ function getPaperBgMm(paper,s,offsetTopMm){
   return '';
 }
 
-// ========== トンボ（修正版: 太さ0.5mm、クリップ対応）==========
-// ========== 枠線描画（トンボ廃止 → カードに枠線） ==========
+// ========== トンボ（コーナーマーク） ==========
+function drawTrimMarksPx(container,s){
+  const len=12, col='#555', th='0.5px';
+  s.positions.forEach(pos=>{
+    const corners=[
+      {x:pos.left,y:pos.top,dx:1,dy:1},
+      {x:pos.left+s.pw,y:pos.top,dx:-1,dy:1},
+      {x:pos.left,y:pos.top+s.ph,dx:1,dy:-1},
+      {x:pos.left+s.pw,y:pos.top+s.ph,dx:-1,dy:-1}
+    ];
+    corners.forEach(c=>{
+      const hLine=document.createElement('div');
+      hLine.style.cssText=`position:absolute;left:${c.dx>0?c.x-len:c.x}px;top:${c.y}px;width:${len}px;height:0;border-top:${th} solid ${col};pointer-events:none;`;
+      container.appendChild(hLine);
+      const vLine=document.createElement('div');
+      vLine.style.cssText=`position:absolute;left:${c.x}px;top:${c.dy>0?c.y-len:c.y}px;width:0;height:${len}px;border-left:${th} solid ${col};pointer-events:none;`;
+      container.appendChild(vLine);
+    });
+  });
+}
+
+function makeTrimMarksMm(s){
+  const len=3, col='#555', th='0.2pt';
+  let html='';
+  s.positions.forEach(pos=>{
+    const x=(pos.left*0.5).toFixed(1), y=(pos.top*0.5).toFixed(1);
+    const r=(pos.left*0.5+s.mmW).toFixed(1), b=(pos.top*0.5+s.mmH).toFixed(1);
+    const corners=[
+      {cx:x,cy:y,dx:1,dy:1},
+      {cx:r,cy:y,dx:-1,dy:1},
+      {cx:x,cy:b,dx:1,dy:-1},
+      {cx:r,cy:b,dx:-1,dy:-1}
+    ];
+    corners.forEach(c=>{
+      const hx=c.dx>0?(parseFloat(c.cx)-len).toFixed(1):c.cx;
+      html+=`<div style="position:absolute;left:${hx}mm;top:${c.cy}mm;width:${len}mm;height:0;border-top:${th} solid ${col};pointer-events:none;"></div>`;
+      const vy=c.dy>0?(parseFloat(c.cy)-len).toFixed(1):c.cy;
+      html+=`<div style="position:absolute;left:${c.cx}mm;top:${vy}mm;width:0;height:${len}mm;border-left:${th} solid ${col};pointer-events:none;"></div>`;
+    });
+  });
+  return html;
+}
+
 function drawCardBordersPx(container,s){
-  // プレビュー用：各カードに枠線を描画
   s.positions.forEach(pos=>{
     const d=document.createElement('div');
-    d.style.cssText=`position:absolute;left:${pos.left}px;top:${pos.top}px;width:${s.pw}px;height:${s.ph}px;border:1px solid #888;box-sizing:border-box;pointer-events:none;`;
+    d.style.cssText=`position:absolute;left:${pos.left}px;top:${pos.top}px;width:${s.pw}px;height:${s.ph}px;border:0.5px solid #999;box-sizing:border-box;pointer-events:none;`;
     container.appendChild(d);
   });
 }
 
 function makeCardBordersMm(s){
-  // 印刷用：各カードに枠線（切り線として機能）
   let html='';
   s.positions.forEach(pos=>{
     const x=(pos.left*0.5).toFixed(1), y=(pos.top*0.5).toFixed(1);
-    html+=`<div style="position:absolute;left:${x}mm;top:${y}mm;width:${s.mmW}mm;height:${s.mmH}mm;border:0.3pt solid #666;box-sizing:border-box;pointer-events:none;"></div>`;
+    html+=`<div style="position:absolute;left:${x}mm;top:${y}mm;width:${s.mmW}mm;height:${s.mmH}mm;border:0.3pt solid #888;box-sizing:border-box;pointer-events:none;z-index:99;"></div>`;
   });
   return html;
 }
+
+function getCutGuideBeforeMm(s){return state.cutGuide==='trim'?makeTrimMarksMm(s):'';}
+function getCutGuideAfterMm(s){return state.cutGuide==='border'?makeCardBordersMm(s):'';}
+
 
 // ========== カレンダー ==========
 function buildCalendarData(year,month){
@@ -875,6 +927,7 @@ function buildCalendarData(year,month){
   for(let i=0;i<sd;i++)cells.push(0);
   for(let d=1;d<=td;d++)cells.push(d);
   while(cells.length%7!==0)cells.push(0);
+  while(cells.length<42)cells.push(0);
   const rows=[];
   for(let r=0;r<cells.length/7;r++)rows.push(cells.slice(r*7,(r+1)*7));
   return {year,month,rows};
@@ -1521,7 +1574,7 @@ function buildCardPrintHTML(s,data,dataIdxMap,isBack){
         <div style="position:absolute;top:${cT+2}mm;left:${cL+2}mm;right:2mm;bottom:2mm;font-size:${scaledMmFs};color:#222;font-family:${getFF()};font-weight:${getFW()};text-align:${state.textAlign};overflow:hidden;${vs}">${esc(text)}</div>
         <div style="position:absolute;bottom:1mm;right:2mm;font-size:5pt;color:#aaa;font-family:${getFF()};">${di+1}</div>`;
     }
-    cards+=`<div style="position:absolute;width:${s.mmW}mm;height:${s.mmH}mm;top:${top}mm;left:${left}mm;overflow:hidden;box-sizing:border-box;background:white;border:0.3pt solid #666;${rot}">${makeHolesMmHTML(s)}${inner}</div>`;
+    cards+=`<div style="position:absolute;width:${s.mmW}mm;height:${s.mmH}mm;top:${top}mm;left:${left}mm;overflow:hidden;box-sizing:border-box;background:white;${rot}">${makeHolesMmHTML(s)}${inner}</div>`;
   });
   return cards;
 }
@@ -1534,7 +1587,7 @@ function updatePreview(){
   preview.style.width=isL?'594px':'420px';
   preview.style.height=isL?'420px':'594px';
   preview.innerHTML='';
-  drawCardBordersPx(preview,s);
+  if(state.cutGuide==='trim') drawTrimMarksPx(preview,s);
   updateBindHint();
 
   const year=parseInt(document.getElementById('calYear').value);
@@ -1555,7 +1608,7 @@ function updatePreview(){
 
   s.positions.forEach((pos,i)=>{
     const card=document.createElement('div');
-    card.style.cssText=`position:absolute;width:${s.pw}px;height:${s.ph}px;top:${pos.top}px;left:${pos.left}px;overflow:hidden;box-sizing:border-box;background:white;border:1px solid #888;`;
+    card.style.cssText=`position:absolute;width:${s.pw}px;height:${s.ph}px;top:${pos.top}px;left:${pos.left}px;overflow:hidden;box-sizing:border-box;background:white;`;
 
     card.appendChild(makeHolesPx(s));
 
@@ -1639,6 +1692,7 @@ function updatePreview(){
     }
     preview.appendChild(card);
   });
+  if(state.cutGuide==='border') drawCardBordersPx(preview,s);
 }
 
 // ========== 裏面マッピング（カード単位ペア対応）==========
@@ -1684,8 +1738,8 @@ function printPage(bothSides){
     // backPosMap[backPos]=frontIdx → 裏面のbackPos位置には data[frontIdx*2+1]
     const backMap=backPosMap.map(fi=>fi*2+1);
 
-    const p1=`<div class="page">${makeCardBordersMm(s)}${buildCardPrintHTML(s,data,frontMap,false)}</div>`;
-    const p2=`<div class="page">${makeCardBordersMm(s)}${buildCardPrintHTML(s,data,backMap,true)}</div>`;
+    const p1=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,frontMap,false)}${getCutGuideAfterMm(s)}</div>`;
+    const p2=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,backMap,true)}${getCutGuideAfterMm(s)}</div>`;
 
     openPrintWindow(s,p1+p2);
     return;
@@ -1717,8 +1771,8 @@ function printPage(bothSides){
         // 裏面マップ: backPosMap[pos]=frontIdx → data[frontIdx*2+1]
         const backMap=backPosMap.map(fi=>fi*2+1);
 
-        allPages+=`<div class="page">${makeCardBordersMm(s)}${buildCardPrintHTML(s,data,frontMap,false)}</div>`;
-        allPages+=`<div class="page">${makeCardBordersMm(s)}${buildCardPrintHTML(s,data,backMap,true)}</div>`;
+        allPages+=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,frontMap,false)}${getCutGuideAfterMm(s)}</div>`;
+        allPages+=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,backMap,true)}${getCutGuideAfterMm(s)}</div>`;
       }
     } else {
       // 片面
@@ -1727,7 +1781,7 @@ function printPage(bothSides){
         const pageData=[];
         for(let c=0;c<n;c++) pageData.push(chunks[pg*n+c]||'');
         const fm=Array.from({length:n},(_,i)=>i);
-        allPages+=`<div class="page">${makeCardBordersMm(s)}${buildCardPrintHTML(s,pageData,fm,false)}</div>`;
+        allPages+=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,pageData,fm,false)}${getCutGuideAfterMm(s)}</div>`;
       }
     }
     openPrintWindow(s,allPages);
@@ -1744,11 +1798,11 @@ function printPage(bothSides){
   }
 
   const fm=Array.from({length:n},(_,i)=>i);
-  const p1=`<div class="page">${makeCardBordersMm(s)}${buildCardPrintHTML(s,data,fm,false)}</div>`;
+  const p1=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,fm,false)}${getCutGuideAfterMm(s)}</div>`;
   let p2='';
   if(bothSides){
     const bm=getBacksideOrder(s);
-    p2=`<div class="page">${makeCardBordersMm(s)}${buildCardPrintHTML(s,data,bm,true)}</div>`;
+    p2=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,bm,true)}${getCutGuideAfterMm(s)}</div>`;
   }
 
   openPrintWindow(s,p1+p2);
