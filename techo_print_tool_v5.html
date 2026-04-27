@@ -111,9 +111,9 @@ button:hover { background: #f5f5f5; }
 </head>
 <body>
 
-<h1>手帳リフィル A4印刷ツール v5</h1>
-<p class="sub">Micro5 / M6 / バイブル / A4 ／ テキスト・カレンダー・週間バーチカル・Todo</p>
-<p style="font-size:12px;color:#d00;font-weight:bold;margin:0 0 8px;padding:6px 10px;background:#fff3f3;border:1px solid #fcc;border-radius:6px;">⚠ Windows PC専用（Chrome / Edge推奨）｜iPhone・iPadでの使用はできません</p>
+<h1 data-i18n="title">手帳リフィル A4印刷ツール v5</h1>
+<p class="sub" data-i18n="subtitle">Micro5 / M6 / バイブル / A4 ／ テキスト・カレンダー・週間バーチカル・Todo</p>
+<p style="font-size:12px;color:#d00;font-weight:bold;margin:0 0 8px;padding:6px 10px;background:#fff3f3;border:1px solid #fcc;border-radius:6px;" data-i18n="winOnly">⚠ Windows PC専用（Chrome / Edge推奨）｜iPhone・iPadでの使用はできません</p>
 
 <div class="controls">
 
@@ -128,7 +128,7 @@ button:hover { background: #f5f5f5; }
   </div>
 
   <div class="row">
-    <span class="label">モード</span>
+    <span class="label" data-i18n="lblMode">モード</span>
     <div class="tog-group" id="modeGroup">
       <button class="tog active" onclick="setMode('text')">テキスト</button>
       <button class="tog" onclick="setMode('cal')">月間カレンダー</button>
@@ -140,7 +140,7 @@ button:hover { background: #f5f5f5; }
   </div>
 
   <div class="row">
-    <span class="label">サイズ</span>
+    <span class="label" data-i18n="lblSize">サイズ</span>
     <div class="tog-group" id="sizeGroup">
       <button class="tog active" onclick="setSetting('size','micro5v')">Micro5 縦</button>
       <button class="tog" onclick="setSetting('size','micro5h')">Micro5 横</button>
@@ -154,14 +154,14 @@ button:hover { background: #f5f5f5; }
   <!-- テキストモード -->
   <div id="textSection">
     <div class="row">
-      <span class="label">書き方向</span>
+      <span class="label" data-i18n="lblDir">書き方向</span>
       <div class="tog-group" id="dirGroup">
         <button class="tog active" onclick="setSetting('dir','h')">横書き</button>
         <button class="tog" onclick="setSetting('dir','v')">縦書き</button>
       </div>
     </div>
     <div class="row">
-      <span class="label">配置</span>
+      <span class="label" data-i18n="lblAlign">配置</span>
       <div class="tog-group" id="textAlignGroup">
         <button class="tog active" onclick="setSetting('textAlign','left')">左</button>
         <button class="tog" onclick="setSetting('textAlign','center')">中央</button>
@@ -169,7 +169,7 @@ button:hover { background: #f5f5f5; }
       </div>
     </div>
     <div class="row" style="align-items:flex-start;">
-      <span class="label">テキスト</span>
+      <span class="label" data-i18n="lblText">テキスト</span>
       <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
         <div style="display:flex;gap:8px;align-items:center;">
           <button id="editTextBtn" onclick="openTextModal()" style="background:#333;color:white;border-color:#333;font-size:12px;padding:6px 16px;">テキスト入力・編集</button>
@@ -208,13 +208,13 @@ button:hover { background: #f5f5f5; }
   <!-- 月間カレンダーモード -->
   <div id="calSection" style="display:none;">
     <div class="row">
-      <span class="label">開始年月</span>
+      <span class="label" data-i18n="lblStartMonth">開始年月</span>
       <select id="calYear"></select>
       <select id="calMonth"></select>
       <span class="note" id="calInfo"></span>
     </div>
     <div class="row">
-      <span class="label">スタイル</span>
+      <span class="label" data-i18n="lblStyle">スタイル</span>
       <div class="tog-group" id="calStyleGroup">
         <button class="tog active" onclick="setSetting('calStyle','simple')">シンプル</button>
         <button class="tog" onclick="setSetting('calStyle','grid')">グリッド（枠付き）</button>
@@ -225,7 +225,7 @@ button:hover { background: #f5f5f5; }
   <!-- 週間バーチカルモード -->
   <div id="weeklySection" style="display:none;">
     <div class="row">
-      <span class="label">レイアウト</span>
+      <span class="label" data-i18n="lblLayout">レイアウト</span>
       <div class="tog-group" id="weeklyStyleGroup">
         <button class="tog active" onclick="setSetting('weeklyStyle','horizontal')">横型（バーチカル）</button>
         <button class="tog" onclick="setSetting('weeklyStyle','vertical')">縦型（リスト）</button>
@@ -252,7 +252,7 @@ button:hover { background: #f5f5f5; }
   <!-- ハビットトラッカーモード -->
   <div id="habitSection" style="display:none;">
     <div class="row">
-      <span class="label">期間</span>
+      <span class="label" data-i18n="lblPeriod">期間</span>
       <div class="tog-group" id="habitTypeGroup">
         <button class="tog active" onclick="setSetting('habitType','weekly')">グリッド（曜日×5）</button>
         <button class="tog" onclick="setSetting('habitType','circle')">トラック</button>
@@ -266,7 +266,7 @@ button:hover { background: #f5f5f5; }
     <summary class="panel-summary">✏️ 文字設定</summary>
     <div class="panel-body">
       <div class="row" id="paperRow">
-        <span class="label">用紙</span>
+        <span class="label" data-i18n="lblPaper">用紙</span>
         <div class="tog-group" id="paperGroup">
           <button class="tog active" onclick="setSetting('paper','ruled')">罫線</button>
           <button class="tog" onclick="setSetting('paper','grid2')">方眼2mm</button>
@@ -275,14 +275,14 @@ button:hover { background: #f5f5f5; }
         </div>
       </div>
       <div class="row">
-        <span class="label">フォント</span>
+        <span class="label" data-i18n="lblFont">フォント</span>
         <div class="tog-group" id="fontGroup">
           <button class="tog active" onclick="setSetting('font','gothic')">ゴシック</button>
           <button class="tog" onclick="setSetting('font','mincho')">明朝</button>
         </div>
       </div>
       <div class="row">
-        <span class="label">太さ</span>
+        <span class="label" data-i18n="lblWeight">太さ</span>
         <div class="tog-group" id="weightGroup">
           <button class="tog" onclick="setSetting('weight','normal')">標準</button>
           <button class="tog active" onclick="setSetting('weight','bold')">太字</button>
@@ -290,7 +290,7 @@ button:hover { background: #f5f5f5; }
         </div>
       </div>
       <div class="row">
-        <span class="label">文字サイズ</span>
+        <span class="label" data-i18n="lblFontSize">文字サイズ</span>
         <div class="tog-group" id="fontScaleGroup">
           <button class="tog" onclick="setSetting('fontScale','0.8')">小</button>
           <button class="tog active" onclick="setSetting('fontScale','1')">中</button>
@@ -305,14 +305,21 @@ button:hover { background: #f5f5f5; }
     <summary class="panel-summary">⚙️ 詳細設定</summary>
     <div class="panel-body">
       <div class="row">
-        <span class="label">曜日</span>
-        <div class="tog-group" id="dayLangGroup">
-          <button class="tog active" onclick="setSetting('dayLang','ja')">日本語</button>
-          <button class="tog" onclick="setSetting('dayLang','en')">英語</button>
+        <span class="label" data-i18n="lblLang">言語</span>
+        <div class="tog-group" id="uiLangGroup">
+          <button class="tog active" onclick="setUiLang('ja')">日本語</button>
+          <button class="tog" onclick="setUiLang('en')">English</button>
         </div>
       </div>
       <div class="row">
-        <span class="label">線の濃さ</span>
+        <span class="label" data-i18n="lblDayLang">曜日</span>
+        <div class="tog-group" id="dayLangGroup">
+          <button class="tog active" onclick="setSetting('dayLang','ja')" data-i18n="dayJa">日本語</button>
+          <button class="tog" onclick="setSetting('dayLang','en')" data-i18n="dayEn">英語</button>
+        </div>
+      </div>
+      <div class="row">
+        <span class="label" data-i18n="lblLineAlpha">線の濃さ</span>
         <div class="tog-group" id="lineAlphaGroup">
           <button class="tog" onclick="setLineAlpha('0')">非表示</button>
           <button class="tog" onclick="setLineAlpha('0.1')">極薄</button>
@@ -325,7 +332,7 @@ button:hover { background: #f5f5f5; }
         <span id="lineAlphaVal" style="font-size:11px;color:#666;">35%</span>
       </div>
       <div class="row">
-        <span class="label">パンチ穴</span>
+        <span class="label" data-i18n="lblHole">パンチ穴</span>
         <div class="tog-group" id="holeAlphaGroup">
           <button class="tog" onclick="setSetting('holeAlpha','0')">非表示</button>
           <button class="tog" onclick="setSetting('holeAlpha','0.15')">薄い</button>
@@ -335,7 +342,7 @@ button:hover { background: #f5f5f5; }
         </div>
       </div>
       <div class="row">
-        <span class="label">裁断ガイド</span>
+        <span class="label" data-i18n="lblCutGuide">裁断ガイド</span>
         <div class="tog-group" id="cutGuideGroup">
           <button class="tog active" onclick="setSetting('cutGuide','trim')">トンボ</button>
           <button class="tog" onclick="setSetting('cutGuide','border')">枠線</button>
@@ -349,7 +356,7 @@ button:hover { background: #f5f5f5; }
     <summary class="panel-summary">🖼️ 画像設定</summary>
     <div class="panel-body">
       <div class="row">
-        <span class="label">画像</span>
+        <span class="label" data-i18n="lblImage">画像</span>
         <input type="file" id="imgInput" accept="image/*" onchange="loadImage(event)" style="font-size:12px;">
         <img id="imgThumb" class="img-thumb">
         <button class="sm-btn" onclick="clearImage()">削除</button>
@@ -357,7 +364,7 @@ button:hover { background: #f5f5f5; }
       <div id="imgOptions" style="display:none;">
         <p id="imgCopyrightHint" style="font-size:11px;color:#c60;background:#fff8f0;border:1px solid #f0d8a0;border-radius:6px;padding:8px 12px;margin:0 0 10px;line-height:1.6;">⚠ 著作権にご注意ください ― 個人利用の範囲であっても、権利者の許諾を確認してからお使いください。</p>
         <div class="row">
-          <span class="label">濃さ</span>
+          <span class="label" data-i18n="lblImgAlpha">濃さ</span>
           <div class="tog-group" id="imgAlphaGroup">
             <button class="tog" onclick="setSetting('imgAlpha','0.1')">透かし</button>
             <button class="tog" onclick="setSetting('imgAlpha','0.25')">薄い</button>
@@ -366,7 +373,7 @@ button:hover { background: #f5f5f5; }
           </div>
         </div>
         <div class="row">
-          <span class="label">サイズ</span>
+          <span class="label" data-i18n="lblImgSize">サイズ</span>
           <div class="tog-group" id="imgSizeGroup">
             <button class="tog" onclick="setImgSize('25')">25%</button>
             <button class="tog" onclick="setImgSize('50')">50%</button>
@@ -377,7 +384,7 @@ button:hover { background: #f5f5f5; }
           <span id="imgSizeVal" style="font-size:11px;color:#666;">75%</span>
         </div>
         <div class="row">
-          <span class="label">位置</span>
+          <span class="label" data-i18n="lblImgPos">位置</span>
           <div class="tog-group" id="imgPosGroup">
             <button class="tog active" onclick="setImgPos('top')">上</button>
             <button class="tog" onclick="setImgPos('center')">中央</button>
@@ -386,7 +393,7 @@ button:hover { background: #f5f5f5; }
           </div>
         </div>
         <div class="row" id="imgNudgeRow">
-          <span class="label">移動</span>
+          <span class="label" data-i18n="lblMove">移動</span>
           <div class="tog-group">
             <button class="sm-btn" onclick="nudgeImg(0,-5)">▲</button>
             <button class="sm-btn" onclick="nudgeImg(0,5)">▼</button>
@@ -394,7 +401,7 @@ button:hover { background: #f5f5f5; }
             <button class="sm-btn" onclick="nudgeImg(5,0)">▶</button>
             <button class="sm-btn" onclick="nudgeImg(0,0)" style="color:#d00;">⟳</button>
           </div>
-          <span class="label" style="margin-left:12px;">回転</span>
+          <span class="label" style="margin-left:12px;" data-i18n="lblRotate">回転</span>
           <div class="tog-group">
             <button class="sm-btn" onclick="rotateImg(-90)">↺90°</button>
             <button class="sm-btn" onclick="rotateImg(90)">↻90°</button>
@@ -428,8 +435,133 @@ button:hover { background: #f5f5f5; }
 </div>
 
 <script>
-const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', cutGuide: 'trim', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
+const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', cutGuide: 'trim', uiLang: 'ja', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
 let textChunks=[]; // テキストモード用：分割済みチャンク配列
+
+const i18n={
+  ja:{
+    title:'手帳リフィル A4印刷ツール v5',
+    subtitle:'Micro5 / M6 / バイブル / A4 ／ テキスト・カレンダー・週間バーチカル・Todo',
+    winOnly:'⚠ Windows PC専用（Chrome / Edge推奨）｜iPhone・iPadでの使用はできません',
+    lblMode:'モード', lblSize:'サイズ', lblDir:'書き方向', lblAlign:'配置',
+    lblText:'テキスト', lblStyle:'スタイル', lblLayout:'レイアウト', lblPeriod:'期間',
+    lblPaper:'用紙', lblFont:'フォント', lblWeight:'太さ', lblFontSize:'文字サイズ',
+    lblDayLang:'曜日', lblLineAlpha:'線の濃さ', lblHole:'パンチ穴', lblCutGuide:'裁断ガイド',
+    lblImage:'画像', lblImgAlpha:'濃さ', lblImgSize:'サイズ', lblImgPos:'位置',
+    lblMove:'移動', lblRotate:'回転', lblStartMonth:'開始年月', lblLang:'言語',
+    modeText:'テキスト', modeCal:'月間カレンダー', modeWeekly:'週間バーチカル',
+    modeTodo:'Todo', modeReading:'読書カード', modeExpense:'支出トラッカー',
+    dirH:'横書き', dirV:'縦書き',
+    alignL:'左', alignC:'中央', alignR:'右',
+    calSimple:'シンプル', calGrid:'グリッド（枠付き）',
+    weeklyH:'横型（バーチカル）', weeklyV:'縦型（リスト）',
+    habitGrid:'グリッド（曜日×5）', habitCircle:'トラック',
+    paperRuled:'罫線', paperGrid2:'方眼2mm', paperGrid5:'方眼5mm', paperBlank:'無地',
+    fontGothic:'ゴシック', fontMincho:'明朝',
+    weightNormal:'標準', weightBold:'太字', weightBlack:'極太',
+    fontSizeS:'小', fontSizeM:'中', fontSizeL:'大',
+    dayJa:'日本語', dayEn:'英語',
+    lineHide:'非表示', lineVLight:'極薄', lineLight:'薄い', lineNormal:'標準', lineDark:'濃い', lineVDark:'極濃',
+    holeHide:'非表示', holeLight:'薄い', holeNormal:'標準', holeDark:'濃い', holeVDark:'極濃',
+    cutTrim:'トンボ', cutBorder:'枠線',
+    imgAlphaWM:'透かし', imgAlphaLight:'薄い', imgAlphaMid:'中間', imgAlphaNormal:'通常',
+    imgPosTop:'上', imgPosCenter:'中央', imgPosBottom:'下', imgPosBg:'背景',
+    btnPreview:'プレビュー更新', btnSingle:'片面印刷', btnDuplex:'両面印刷',
+    btnPdfSingle:'PDF保存（片面）', btnPdfDuplex:'PDF保存（両面）', btnClear:'クリア',
+    btnEditText:'テキスト入力・編集', btnDelete:'削除',
+    pdfHint:'⚠ PDF保存：印刷ダイアログで「送信先」を「PDFに保存」に変更。コンビニ印刷にも対応。',
+    bannerPlaceholder:'＋ バナー画像を追加（SNS用ヘッダーなど）',
+    imgCopyright:'⚠ 著作権にご注意ください ― 個人利用の範囲であっても、権利者の許諾を確認してからお使いください。',
+    panelText:'✏️ 文字設定', panelDetail:'⚙️ 詳細設定', panelImage:'🖼️ 画像設定',
+    modalTitle:'テキスト入力', modalDrag:'— ドラッグで移動', modalClear:'クリア', modalDone:'入力完了',
+    modalPlaceholder:'テキストを入力・貼り付けしてください\n\n改行で段落を分けると、カードごとに自動で分割されます。\n長文はサイズに合わせて複数カードに振り分けられます。',
+    charUnit:'文字', pageLabel:'ページ',
+    prevPage:'◀ 前ページ', nextPage:'次ページ ▶',
+    noteWeekly:'日付は手書き記入式。汎用的に何週でも使い回せます。',
+    noteTodo:'チェックボックス付き罫線カード。手書きでタスクを記入して使えます。',
+    noteReading:'タイトル・著者・日付・評価・メモ欄。シンプルな読書記録カード。',
+    noteExpense:'日付・項目・金額の記入欄。日々の支出管理に。',
+    noteHabit:'グリッド：曜日×5週+右に項目欄。トラック：楕円レーンで周回、中央に手書きスペース。',
+    savePdfAlert:'印刷ダイアログが開きます。\n\n【PDF保存手順】\n1.「送信先」または「プリンター」を「PDFに保存」に変更\n2.「保存」をクリック\n\n※コンビニのネットプリントにも対応できます',
+    uiJa:'日本語', uiEn:'English',
+    sizeM5v:'Micro5 縦', sizeM5h:'Micro5 横', sizeM6v:'M6 縦', sizeM6h:'M6 横', sizeBible:'バイブル', sizeA4:'A4',
+    calInfoTpl:'片面{n}ヶ月 / 両面{n2}ヶ月',
+    bindShort:'⚠ 両面印刷時は必ず「短辺綴じ」を選択してください',
+    bindA4:'ℹ A4サイズは片面印刷のみ対応',
+    bindBg:'⚠ 画像・方眼を印刷する場合：ブラウザの印刷設定で「背景のグラフィックス」をONにしてください',
+    pageTpl:'ページ {c} / {t}',
+    charTpl:'{n}文字',
+    chunkTpl:'{n}カード分 / {cps}枚×{p}ページ',
+    splitTpl:'→ {n}カードに分割',
+    monthNames:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'],
+    yearMonthTpl:'{y}年 {m}月',
+    optMonth:'{m}月',
+    readFields:['タイトル:','著者:','読了日:','評価: ☆☆☆☆☆',''],
+    readMemo:'メモ',
+    expDate:'日付', expItem:'項目', expAmount:'金額',
+  },
+  en:{
+    title:'Planner Refill A4 Print Tool v5',
+    subtitle:'Micro5 / M6 / Bible / A4 — Text, Calendar, Weekly Vertical, Todo',
+    winOnly:'⚠ Windows PC only (Chrome / Edge recommended) | Not available on iPhone or iPad',
+    lblMode:'Mode', lblSize:'Size', lblDir:'Direction', lblAlign:'Align',
+    lblText:'Text', lblStyle:'Style', lblLayout:'Layout', lblPeriod:'Period',
+    lblPaper:'Paper', lblFont:'Font', lblWeight:'Weight', lblFontSize:'Font Size',
+    lblDayLang:'Day Labels', lblLineAlpha:'Line Opacity', lblHole:'Punch Holes', lblCutGuide:'Cut Guide',
+    lblImage:'Image', lblImgAlpha:'Opacity', lblImgSize:'Size', lblImgPos:'Position',
+    lblMove:'Move', lblRotate:'Rotate', lblStartMonth:'Start Month', lblLang:'Language',
+    modeText:'Text', modeCal:'Monthly Calendar', modeWeekly:'Weekly Vertical',
+    modeTodo:'Todo', modeReading:'Reading Card', modeExpense:'Expense Tracker',
+    dirH:'Horizontal', dirV:'Vertical',
+    alignL:'Left', alignC:'Center', alignR:'Right',
+    calSimple:'Simple', calGrid:'Grid (bordered)',
+    weeklyH:'Horizontal (vertical)', weeklyV:'Vertical (list)',
+    habitGrid:'Grid (day×5)', habitCircle:'Track',
+    paperRuled:'Ruled', paperGrid2:'Grid 2mm', paperGrid5:'Grid 5mm', paperBlank:'Blank',
+    fontGothic:'Gothic', fontMincho:'Serif',
+    weightNormal:'Normal', weightBold:'Bold', weightBlack:'Heavy',
+    fontSizeS:'S', fontSizeM:'M', fontSizeL:'L',
+    dayJa:'Japanese', dayEn:'English',
+    lineHide:'Hide', lineVLight:'X-Light', lineLight:'Light', lineNormal:'Normal', lineDark:'Dark', lineVDark:'X-Dark',
+    holeHide:'Hide', holeLight:'Light', holeNormal:'Normal', holeDark:'Dark', holeVDark:'X-Dark',
+    cutTrim:'Trim Marks', cutBorder:'Border',
+    imgAlphaWM:'Watermark', imgAlphaLight:'Light', imgAlphaMid:'Medium', imgAlphaNormal:'Normal',
+    imgPosTop:'Top', imgPosCenter:'Center', imgPosBottom:'Bottom', imgPosBg:'Background',
+    btnPreview:'Refresh Preview', btnSingle:'Single-side Print', btnDuplex:'Duplex Print',
+    btnPdfSingle:'Save PDF (single)', btnPdfDuplex:'Save PDF (duplex)', btnClear:'Clear',
+    btnEditText:'Edit Text', btnDelete:'Delete',
+    pdfHint:'⚠ PDF: In print dialog, change "Destination" to "Save as PDF". Compatible with convenience store printing.',
+    bannerPlaceholder:'+ Add banner image (SNS header etc.)',
+    imgCopyright:'⚠ Please check copyright — even for personal use, please verify permission from the rights holder.',
+    panelText:'✏️ Text Settings', panelDetail:'⚙️ Advanced Settings', panelImage:'🖼️ Image Settings',
+    modalTitle:'Text Input', modalDrag:'— Drag to move', modalClear:'Clear', modalDone:'Done',
+    modalPlaceholder:'Enter or paste text here.\n\nUse line breaks to separate paragraphs for auto-splitting across cards.\nLong text will be distributed across multiple cards.',
+    charUnit:' chars', pageLabel:'Page',
+    prevPage:'◀ Prev', nextPage:'Next ▶',
+    noteWeekly:'Dates are handwritten. Reusable for any week.',
+    noteTodo:'Lined cards with checkboxes. Write tasks by hand.',
+    noteReading:'Title, author, date, rating, and notes. A simple reading log card.',
+    noteExpense:'Date, item, and amount fields. For daily expense tracking.',
+    noteHabit:'Grid: day×5 weeks + item column. Track: oval lanes, center for handwriting.',
+    savePdfAlert:'Print dialog will open.\n\n[PDF Save Steps]\n1. Change "Destination" or "Printer" to "Save as PDF"\n2. Click "Save"\n\n* Also compatible with convenience store net printing.',
+    uiJa:'日本語', uiEn:'English',
+    sizeM5v:'Micro5 V', sizeM5h:'Micro5 H', sizeM6v:'M6 V', sizeM6h:'M6 H', sizeBible:'Bible', sizeA4:'A4',
+    calInfoTpl:'{n} months/side — {n2} months duplex',
+    bindShort:'⚠ For duplex printing, always select "Short-edge binding"',
+    bindA4:'ℹ A4 size supports single-side printing only',
+    bindBg:'⚠ To print images/grid: enable "Background graphics" in browser print settings',
+    pageTpl:'Page {c} / {t}',
+    charTpl:'{n} chars',
+    chunkTpl:'{n} cards / {cps}×{p} pages',
+    splitTpl:'→ Split into {n} cards',
+    monthNames:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    yearMonthTpl:'{m} {y}',
+    optMonth:'{m}',
+    readFields:['Title:','Author:','Finished:','Rating: ☆☆☆☆☆',''],
+    readMemo:'Notes',
+    expDate:'Date', expItem:'Item', expAmount:'Amount',
+  }
+};
 
 const SIZES = {
   micro5v: {
@@ -546,6 +678,131 @@ function getBacksideOrder(s) {
   }
 })();
 
+function setUiLang(lang){
+  state.uiLang=lang;
+  document.getElementById('uiLangGroup').querySelectorAll('.tog').forEach((b,i)=>{
+    b.classList.toggle('active',['ja','en'][i]===lang);
+  });
+  applyLang();
+  updatePreview();
+}
+
+function applyLang(){
+  const t=i18n[state.uiLang];
+  // data-i18n属性で一括
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.dataset.i18n;
+    if(t[k]!==undefined) el.textContent=t[k];
+  });
+  // モードボタン
+  const modeKeys=['modeText','modeCal','modeWeekly','modeTodo','modeReading','modeExpense'];
+  document.getElementById('modeGroup').querySelectorAll('.tog').forEach((b,i)=>{if(modeKeys[i])b.textContent=t[modeKeys[i]];});
+  // サイズボタン
+  const sizeKeys=['sizeM5v','sizeM5h','sizeM6v','sizeM6h','sizeBible','sizeA4'];
+  document.getElementById('sizeGroup').querySelectorAll('.tog').forEach((b,i)=>{if(sizeKeys[i])b.textContent=t[sizeKeys[i]];});
+  // 書き方向
+  const dirBtns=document.getElementById('dirGroup').querySelectorAll('.tog');
+  dirBtns[0].textContent=t.dirH; dirBtns[1].textContent=t.dirV;
+  // 配置
+  const alignBtns=document.getElementById('textAlignGroup').querySelectorAll('.tog');
+  alignBtns[0].textContent=t.alignL; alignBtns[1].textContent=t.alignC; alignBtns[2].textContent=t.alignR;
+  // カレンダースタイル
+  const calBtns=document.getElementById('calStyleGroup').querySelectorAll('.tog');
+  calBtns[0].textContent=t.calSimple; calBtns[1].textContent=t.calGrid;
+  // 週間スタイル
+  const wkBtns=document.getElementById('weeklyStyleGroup').querySelectorAll('.tog');
+  wkBtns[0].textContent=t.weeklyH; wkBtns[1].textContent=t.weeklyV;
+  // ハビットタイプ
+  const habBtns=document.getElementById('habitTypeGroup').querySelectorAll('.tog');
+  habBtns[0].textContent=t.habitGrid; habBtns[1].textContent=t.habitCircle;
+  // 用紙
+  const paperBtns=document.getElementById('paperGroup').querySelectorAll('.tog');
+  paperBtns[0].textContent=t.paperRuled; paperBtns[1].textContent=t.paperGrid2; paperBtns[2].textContent=t.paperGrid5; paperBtns[3].textContent=t.paperBlank;
+  // フォント
+  const fontBtns=document.getElementById('fontGroup').querySelectorAll('.tog');
+  fontBtns[0].textContent=t.fontGothic; fontBtns[1].textContent=t.fontMincho;
+  // 太さ
+  const wBtns=document.getElementById('weightGroup').querySelectorAll('.tog');
+  wBtns[0].textContent=t.weightNormal; wBtns[1].textContent=t.weightBold; wBtns[2].textContent=t.weightBlack;
+  // 文字サイズ
+  const fsBtns=document.getElementById('fontScaleGroup').querySelectorAll('.tog');
+  fsBtns[0].textContent=t.fontSizeS; fsBtns[1].textContent=t.fontSizeM; fsBtns[2].textContent=t.fontSizeL;
+  // 線の濃さ
+  const laBtns=document.getElementById('lineAlphaGroup').querySelectorAll('.tog');
+  [t.lineHide,t.lineVLight,t.lineLight,t.lineNormal,t.lineDark,t.lineVDark].forEach((v,i)=>{if(laBtns[i])laBtns[i].textContent=v;});
+  // パンチ穴
+  const haBtns=document.getElementById('holeAlphaGroup').querySelectorAll('.tog');
+  [t.holeHide,t.holeLight,t.holeNormal,t.holeDark,t.holeVDark].forEach((v,i)=>{if(haBtns[i])haBtns[i].textContent=v;});
+  // 裁断ガイド
+  const cgBtns=document.getElementById('cutGuideGroup').querySelectorAll('.tog');
+  cgBtns[0].textContent=t.cutTrim; cgBtns[1].textContent=t.cutBorder;
+  // 画像濃さ
+  const iaBtns=document.getElementById('imgAlphaGroup').querySelectorAll('.tog');
+  [t.imgAlphaWM,t.imgAlphaLight,t.imgAlphaMid,t.imgAlphaNormal].forEach((v,i)=>{if(iaBtns[i])iaBtns[i].textContent=v;});
+  // 画像位置
+  const ipBtns=document.getElementById('imgPosGroup').querySelectorAll('.tog');
+  ipBtns[0].textContent=t.imgPosTop; ipBtns[1].textContent=t.imgPosCenter; ipBtns[2].textContent=t.imgPosBottom; ipBtns[3].textContent=t.imgPosBg;
+  // ボタン行
+  const btnRow=document.querySelector('.btn-row');
+  if(btnRow){
+    const btns=btnRow.querySelectorAll('button');
+    btns[0].textContent=t.btnPreview; btns[1].textContent=t.btnSingle; btns[2].textContent=t.btnDuplex;
+    btns[3].textContent=t.btnPdfSingle; btns[4].textContent=t.btnPdfDuplex; btns[5].textContent=t.btnClear;
+  }
+  // テキスト編集ボタン
+  document.getElementById('editTextBtn').textContent=t.btnEditText;
+  // 画像削除ボタン
+  const delBtn=document.querySelector('#imgSettingsPanel .sm-btn');
+  if(delBtn)delBtn.textContent=t.btnDelete;
+  // パネルサマリー
+  document.querySelector('#textSettingsPanel .panel-summary').textContent=t.panelText;
+  document.querySelectorAll('.panel-details').forEach(d=>{
+    const sum=d.querySelector('.panel-summary');
+    if(sum.textContent.includes('詳細')||sum.textContent.includes('Advanced')) sum.textContent=t.panelDetail;
+    if(sum.textContent.includes('画像')||sum.textContent.includes('Image')) sum.textContent=t.panelImage;
+  });
+  // PDF Hint
+  document.getElementById('pdfHint').textContent=t.pdfHint;
+  // バナー
+  document.getElementById('bannerPlaceholder').textContent=t.bannerPlaceholder;
+  // 著作権
+  const cpEl=document.getElementById('imgCopyrightHint');
+  if(cpEl)cpEl.textContent=t.imgCopyright;
+  // モーダル
+  const mh=document.querySelector('#modalHeader h2');
+  if(mh)mh.innerHTML=t.modalTitle+' <span style="font-size:10px;color:#aaa;font-weight:400;">'+t.modalDrag+'</span>';
+  document.querySelector('.modal-clear-btn').textContent=t.modalClear;
+  document.querySelector('.modal-close-btn').textContent=t.modalDone;
+  document.getElementById('modalTxt').placeholder=t.modalPlaceholder;
+  // ノート
+  const noteMap={weeklySection:'noteWeekly',todoSection:'noteTodo',readingSection:'noteReading',expenseSection:'noteExpense',habitSection:'noteHabit'};
+  for(const[id,key]of Object.entries(noteMap)){
+    const n=document.querySelector('#'+id+' .note');
+    if(n)n.textContent=t[key];
+  }
+  // ページナビ
+  const prevBtn=document.querySelector('#pageNav button:first-child');
+  const nextBtn=document.querySelector('#pageNav button:last-child');
+  if(prevBtn)prevBtn.textContent=t.prevPage;
+  if(nextBtn)nextBtn.textContent=t.nextPage;
+  // 年月セレクト
+  const yrSel=document.getElementById('calYear');
+  if(yrSel){yrSel.querySelectorAll('option').forEach(o=>{
+    o.textContent=state.uiLang==='en'?o.value:o.value+'年';
+  });}
+  const moSel=document.getElementById('calMonth');
+  if(moSel){moSel.querySelectorAll('option').forEach((o,i)=>{
+    o.textContent=t.optMonth.replace('{m}',t.monthNames[i]);
+  });}
+  // 動的テキスト再更新
+  updateCalInfo();
+  updateBindHint();
+  updatePageNav();
+  if(typeof updateTxtPreview==='function')updateTxtPreview();
+  // title
+  document.title=t.title;
+}
+
 function setMode(mode) {
   state.mode=mode;
   const modes=['text','cal','weekly','todo','reading','expense'];
@@ -592,18 +849,20 @@ function setSetting(key, val) {
 
 function updateCalInfo(){
   const n=SIZES[state.size].cardsPerSheet;
-  document.getElementById('calInfo').textContent=`片面${n}ヶ月 / 両面${n*2}ヶ月`;
+  const t=i18n[state.uiLang].calInfoTpl.replace('{n}',n).replace('{n2}',n*2);
+  document.getElementById('calInfo').textContent=t;
 }
 function updateBindHint(){
   const el=document.getElementById('bindHint');
   const s=SIZES[state.size];
+  const L=i18n[state.uiLang];
   const lines=[];
   if(s.bindType!=='none'){
-    lines.push('⚠ 両面印刷時は必ず「短辺綴じ」を選択してください');
+    lines.push(L.bindShort);
   } else {
-    lines.push('ℹ A4サイズは片面印刷のみ対応');
+    lines.push(L.bindA4);
   }
-  lines.push('⚠ 画像・方眼を印刷する場合：ブラウザの印刷設定で「背景のグラフィックス」をONにしてください');
+  lines.push(L.bindBg);
   el.innerHTML=lines.join('<br>');
   el.style.color='#d00';
   el.style.fontWeight='700';
@@ -711,7 +970,8 @@ function updatePageNav(){
   const nav=document.getElementById('pageNav');
   const show=state.mode==='text'&&textChunks.length>n;
   nav.style.display=show?'':'none';
-  document.getElementById('pageIndicator').textContent=`ページ ${state.currentPage+1} / ${totalPages}`;
+  const L=i18n[state.uiLang];
+  document.getElementById('pageIndicator').textContent=L.pageTpl.replace('{c}',state.currentPage+1).replace('{t}',totalPages);
 }
 
 // ========== スライダー連動 ==========
@@ -936,6 +1196,10 @@ function buildCalendarData(year,month){
 function getDayLabels(){
   return state.dayLang==='en'?['Mon','Tue','Wed','Thu','Fri','Sat','Sun']:['月','火','水','木','金','土','日'];
 }
+function getCalHeader(year,month){
+  const L=i18n[state.uiLang];
+  return L.yearMonthTpl.replace('{y}',year).replace('{m}',L.monthNames[month]);
+}
 
 // ========== 共通レンダー ==========
 function renderCardContentPx(s, cardData, cardIdx) {
@@ -957,7 +1221,6 @@ function renderCardContentPx(s, cardData, cardIdx) {
 }
 
 function renderCalGridPx(cal,s,cL,cT,DL){
-  const MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const ff=getFF(),fw=getFW(),nfw=getNumFW(),lc=getLC(),lcl=getLClight();
   const isSmall=s.holeDir==='top';
   const hH=isSmall?14:22, dH=isSmall?10:14;
@@ -965,7 +1228,7 @@ function renderCalGridPx(cal,s,cL,cT,DL){
   const cellH=Math.floor((s.ph-cT-hH-dH-2)/nR);
   const fs=isSmall?8:10, dfs=isSmall?7:8, nfs=isSmall?8:10;
   let h=`<div style="position:absolute;top:${cT}px;left:${cL}px;right:0;bottom:0;font-family:${ff};">`;
-  h+=`<div style="height:${hH}px;display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:${fw};color:#333;border-bottom:0.5px solid ${lc};background:rgba(255,255,255,0.85);">${cal.year}年 ${MN[cal.month]}</div>`;
+  h+=`<div style="height:${hH}px;display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:${fw};color:#333;border-bottom:0.5px solid ${lc};background:rgba(255,255,255,0.85);">${getCalHeader(cal.year,cal.month)}</div>`;
   h+=`<div style="display:flex;height:${dH}px;border-bottom:0.5px solid ${lc};">`;
   DL.forEach((d,i)=>{const c=i===5?'#4a8fd4':i===6?'#d44a4a':'#888';h+=`<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:${dfs}px;font-weight:${fw};color:${c};">${d}</div>`;});
   h+='</div>';
@@ -991,7 +1254,7 @@ function renderCalGridBoxPx(cal,s,cL,cT,DL){
 
   let h=`<div style="position:absolute;top:${cT+pad}px;left:${cL+pad}px;width:${cellW*7}px;height:${headerH+dayHeaderH+cellH*nR}px;font-family:${ff};border:1px solid #999;">`;
   // ヘッダー：年月
-  h+=`<div style="height:${headerH}px;display:flex;align-items:center;justify-content:center;font-size:${hfs}px;font-weight:${fw};color:#333;background:rgba(245,243,239,0.85);border-bottom:1px solid #bbb;">${cal.year}年 ${cal.month+1}月</div>`;
+  h+=`<div style="height:${headerH}px;display:flex;align-items:center;justify-content:center;font-size:${hfs}px;font-weight:${fw};color:#333;background:rgba(245,243,239,0.85);border-bottom:1px solid #bbb;">${getCalHeader(cal.year,cal.month)}</div>`;
   // 曜日ヘッダー
   h+=`<div style="display:flex;height:${dayHeaderH}px;background:rgba(236,232,225,0.85);border-bottom:1px solid #bbb;">`;
   DL.forEach((d,i)=>{
@@ -1090,13 +1353,13 @@ function renderReadingPx(s,cL,cT){
   const aW=s.pw-cL, aH=s.ph-cT;
   const fs=Math.max(6,s.fontSize*0.7);
   const lH=Math.max(12,s.lineH*0.8);
-  const fields=['タイトル:','著者:','読了日:','評価: ☆☆☆☆☆',''];
+  const fields=i18n[state.uiLang].readFields;
   let h=`<div style="position:absolute;top:${cT+2}px;left:${cL+4}px;right:4px;bottom:4px;font-family:${ff};font-size:${fs}px;color:#444;">`;
   fields.forEach(f=>{
     h+=`<div style="height:${lH}px;display:flex;align-items:center;border-bottom:0.5px solid ${getLC()};font-weight:${fw};">${f}</div>`;
   });
   const memoLines=Math.floor((aH-lH*fields.length-20)/lH);
-  h+=`<div style="margin-top:4px;font-size:${fs*0.9}px;color:#888;font-weight:${fw};">メモ</div>`;
+  h+=`<div style="margin-top:4px;font-size:${fs*0.9}px;color:#888;font-weight:${fw};">${i18n[state.uiLang].readMemo}</div>`;
   for(let i=0;i<memoLines;i++){
     h+=`<div style="height:${lH}px;border-bottom:0.5px solid ${getLClight()};"></div>`;
   }
@@ -1111,7 +1374,8 @@ function renderExpensePx(s,cL,cT){
   const fs=Math.max(5,s.fontSize*0.65);
   const lH=Math.max(10,s.lineH*0.7);
   const hH=lH+2;
-  const cols=[{label:'日付',w:0.18},{label:'項目',w:0.47},{label:'金額',w:0.35}];
+  const L=i18n[state.uiLang];
+  const cols=[{label:L.expDate,w:0.18},{label:L.expItem,w:0.47},{label:L.expAmount,w:0.35}];
   let h=`<div style="position:absolute;top:${cT+1}px;left:${cL+2}px;right:2px;bottom:2px;font-family:${ff};font-size:${fs}px;">`;
   // ヘッダー
   h+=`<div style="display:flex;height:${hH}px;border-bottom:1px solid ${getLC()};">`;
@@ -1249,7 +1513,6 @@ function renderHabitPx(s,cL,cT){
 
 // ========== 印刷用レンダー ==========
 function renderCalPrintHTML(cal,s){
-  const MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const DL=getDayLabels();
   const ff=getFF(),fw=getFW(),nfw=getNumFW();
   const isTop=s.holeDir==='top';
@@ -1260,7 +1523,7 @@ function renderCalPrintHTML(cal,s){
   const hfs=isTop?'5':'6', dfs=isTop?'4':'5', nfs=isTop?'6.5':'7';
   let h=`<div style="position:absolute;top:${cT}mm;left:${cL}mm;right:0;bottom:0;font-family:${ff};">`;
   const lc=getLC(),lcl=getLClight();
-  h+=`<div style="height:${hH}mm;display:flex;align-items:center;justify-content:center;font-size:${hfs}pt;font-weight:${fw};color:#333;border-bottom:0.3pt solid ${lc};">${cal.year}年 ${MN[cal.month]}</div>`;
+  h+=`<div style="height:${hH}mm;display:flex;align-items:center;justify-content:center;font-size:${hfs}pt;font-weight:${fw};color:#333;border-bottom:0.3pt solid ${lc};">${getCalHeader(cal.year,cal.month)}</div>`;
   h+=`<div style="display:flex;height:${dH}mm;border-bottom:0.3pt solid ${lc};">`;
   DL.forEach((d,i)=>{const c=i===5?'#4a8fd4':i===6?'#d44a4a':'#888';h+=`<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:${dfs}pt;font-weight:${fw};color:${c};">${d}</div>`;});
   h+='</div>';
@@ -1284,7 +1547,7 @@ function renderCalGridBoxPrintHTML(cal,s){
   const hfs=isTop?'5.5':'7', dfs=isTop?'4':'5.5', nfs=isTop?'5.5':'7';
 
   let h=`<div style="position:absolute;top:${cT+pad}mm;left:${cL+pad}mm;width:${(parseFloat(cellW)*7).toFixed(2)}mm;height:${(headerH+dayHeaderH+parseFloat(cellH)*nR).toFixed(2)}mm;font-family:${ff};border:0.4pt solid #999;">`;
-  h+=`<div style="height:${headerH}mm;display:flex;align-items:center;justify-content:center;font-size:${hfs}pt;font-weight:${fw};color:#333;background:#f5f3ef;border-bottom:0.4pt solid #bbb;">${cal.year}年 ${cal.month+1}月</div>`;
+  h+=`<div style="height:${headerH}mm;display:flex;align-items:center;justify-content:center;font-size:${hfs}pt;font-weight:${fw};color:#333;background:#f5f3ef;border-bottom:0.4pt solid #bbb;">${getCalHeader(cal.year,cal.month)}</div>`;
   h+=`<div style="display:flex;height:${dayHeaderH}mm;background:#ece8e1;border-bottom:0.4pt solid #bbb;">`;
   DL.forEach((d,i)=>{
     const c=i===5?'#4a8fd4':i===6?'#d44a4a':'#555';
@@ -1390,13 +1653,13 @@ function renderReadingPrintHTML(s){
   const aH=s.mmH-cT-2;
   const lH=s.mmLineH;
   const fs=s.mmFontSize;
-  const fields=['タイトル:','著者:','読了日:','評価: ☆☆☆☆☆',''];
+  const fields=i18n[state.uiLang].readFields;
   let h=`<div style="position:absolute;top:${cT+1}mm;left:${cL+1.5}mm;right:1.5mm;bottom:1mm;font-family:${ff};font-size:${fs};color:#444;">`;
   fields.forEach(f=>{
     h+=`<div style="height:${lH}mm;display:flex;align-items:center;border-bottom:0.2pt solid ${getLC()};font-weight:${fw};">${f}</div>`;
   });
   const memoLines=Math.floor((aH-lH*fields.length-4)/lH);
-  h+=`<div style="margin-top:1.5mm;font-size:${parseFloat(fs)*0.85}pt;color:#888;font-weight:${fw};">メモ</div>`;
+  h+=`<div style="margin-top:1.5mm;font-size:${parseFloat(fs)*0.85}pt;color:#888;font-weight:${fw};">${i18n[state.uiLang].readMemo}</div>`;
   for(let i=0;i<memoLines;i++){
     h+=`<div style="height:${lH}mm;border-bottom:0.2pt solid ${getLClight()};"></div>`;
   }
@@ -1413,7 +1676,8 @@ function renderExpensePrintHTML(s){
   const lH=s.mmLineH;
   const hH=lH+0.5;
   const fs=parseFloat(s.mmFontSize)*0.85;
-  const cols=[{label:'日付',w:0.18},{label:'項目',w:0.47},{label:'金額',w:0.35}];
+  const LL=i18n[state.uiLang];
+  const cols=[{label:LL.expDate,w:0.18},{label:LL.expItem,w:0.47},{label:LL.expAmount,w:0.35}];
   let h=`<div style="position:absolute;top:${cT+1}mm;left:${cL+1.5}mm;right:1.5mm;bottom:1mm;font-family:${ff};font-size:${fs}pt;">`;
   const lc=getLC(),lcl=getLClight();
   h+=`<div style="display:flex;height:${hH}mm;border-bottom:0.4pt solid ${lc};">`;
@@ -1856,7 +2120,7 @@ tryPrint();
 }
 
 function savePDF(bothSides){
-  alert('印刷ダイアログが開きます。\n\n【PDF保存手順】\n1.「送信先」または「プリンター」を「PDFに保存」に変更\n2.「保存」をクリック\n\n※コンビニのネットプリントにも対応できます');
+  alert(i18n[state.uiLang].savePdfAlert);
   printPage(bothSides);
 }
 
@@ -1889,27 +2153,28 @@ function clearModalText(){
 function updateModalInfo(){
   const text=document.getElementById('modalTxt').value;
   const len=text.length;
-  document.getElementById('modalCharCount').textContent=len+'文字';
-  // チャンク数
+  const L=i18n[state.uiLang];
+  document.getElementById('modalCharCount').textContent=L.charTpl.replace('{n}',len);
   const s=SIZES[state.size];
   const chunks=splitTextIntoChunks(text,s);
   const realChunks=chunks.filter(c=>c.length>0).length;
   document.getElementById('modalChunkInfo').textContent=
-    realChunks>0?`${realChunks}カード分 / ${s.cardsPerSheet}枚×${Math.ceil(realChunks/s.cardsPerSheet)}ページ`:'';
+    realChunks>0?L.chunkTpl.replace('{n}',realChunks).replace('{cps}',s.cardsPerSheet).replace('{p}',Math.ceil(realChunks/s.cardsPerSheet)):'';
 }
 function updateTxtPreview(){
   const text=document.getElementById('txt').value;
   const box=document.getElementById('txtPreviewBox');
   const countEl=document.getElementById('txtCharCount');
   const chunkEl=document.getElementById('txtChunkCount');
-  countEl.textContent=text.length+'文字';
+  const L=i18n[state.uiLang];
+  countEl.textContent=L.charTpl.replace('{n}',text.length);
   if(text.length>0){
     box.style.display='';
     box.textContent=text.length>120?text.slice(0,120)+'…':text;
     const s=SIZES[state.size];
     const chunks=splitTextIntoChunks(text,s);
     const rc=chunks.filter(c=>c.length>0).length;
-    chunkEl.textContent=rc>1?`→ ${rc}カードに分割`:'';
+    chunkEl.textContent=rc>1?L.splitTpl.replace('{n}',rc):'';
   } else {
     box.style.display='none';
     chunkEl.textContent='';
