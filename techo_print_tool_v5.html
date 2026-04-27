@@ -127,6 +127,14 @@ button:hover { background: #f5f5f5; }
     <input type="file" id="bannerInput" accept="image/*" onchange="loadBanner(event)" style="display:none;">
   </div>
 
+  <div class="row" style="justify-content:flex-end;margin-bottom:2px;">
+    <span class="label" data-i18n="lblLang" style="font-size:11px;">言語</span>
+    <div class="tog-group" id="uiLangGroup" style="gap:2px;">
+      <button class="tog active" onclick="setUiLang('ja')" style="padding:2px 10px;font-size:11px;">日本語</button>
+      <button class="tog" onclick="setUiLang('en')" style="padding:2px 10px;font-size:11px;">English</button>
+    </div>
+  </div>
+
   <div class="row">
     <span class="label" data-i18n="lblMode">モード</span>
     <div class="tog-group" id="modeGroup">
@@ -305,13 +313,6 @@ button:hover { background: #f5f5f5; }
     <summary class="panel-summary">⚙️ 詳細設定</summary>
     <div class="panel-body">
       <div class="row">
-        <span class="label" data-i18n="lblLang">言語</span>
-        <div class="tog-group" id="uiLangGroup">
-          <button class="tog active" onclick="setUiLang('ja')">日本語</button>
-          <button class="tog" onclick="setUiLang('en')">English</button>
-        </div>
-      </div>
-      <div class="row">
         <span class="label" data-i18n="lblDayLang">曜日</span>
         <div class="tog-group" id="dayLangGroup">
           <button class="tog active" onclick="setSetting('dayLang','ja')" data-i18n="dayJa">日本語</button>
@@ -357,9 +358,10 @@ button:hover { background: #f5f5f5; }
     <div class="panel-body">
       <div class="row">
         <span class="label" data-i18n="lblImage">画像</span>
-        <input type="file" id="imgInput" accept="image/*" onchange="loadImage(event)" style="font-size:12px;">
+        <input type="file" id="imgInput" accept="image/*" onchange="loadImage(event)" style="display:none;">
+        <button class="sm-btn" id="imgSelectBtn" onclick="document.getElementById('imgInput').click()" data-i18n="btnImgSelect" style="background:#e8f0fe;border-color:#4a8fd4;color:#1a73e8;">画像を選択</button>
         <img id="imgThumb" class="img-thumb">
-        <button class="sm-btn" onclick="clearImage()">削除</button>
+        <button class="sm-btn" onclick="clearImage()" style="background:#fee;border-color:#d44a4a;color:#d00;" data-i18n="btnDelete">削除</button>
       </div>
       <div id="imgOptions" style="display:none;">
         <p id="imgCopyrightHint" style="font-size:11px;color:#c60;background:#fff8f0;border:1px solid #f0d8a0;border-radius:6px;padding:8px 12px;margin:0 0 10px;line-height:1.6;">⚠ 著作権にご注意ください ― 個人利用の範囲であっても、権利者の許諾を確認してからお使いください。</p>
@@ -468,7 +470,7 @@ const i18n={
     imgPosTop:'上', imgPosCenter:'中央', imgPosBottom:'下', imgPosBg:'背景',
     btnPreview:'プレビュー更新', btnSingle:'片面印刷', btnDuplex:'両面印刷',
     btnPdfSingle:'PDF保存（片面）', btnPdfDuplex:'PDF保存（両面）', btnClear:'クリア',
-    btnEditText:'テキスト入力・編集', btnDelete:'削除',
+    btnEditText:'テキスト入力・編集', btnDelete:'削除', btnImgSelect:'画像を選択',
     pdfHint:'⚠ PDF保存：印刷ダイアログで「送信先」を「PDFに保存」に変更。コンビニ印刷にも対応。',
     bannerPlaceholder:'＋ バナー画像を追加（SNS用ヘッダーなど）',
     imgCopyright:'⚠ 著作権にご注意ください ― 個人利用の範囲であっても、権利者の許諾を確認してからお使いください。',
@@ -529,7 +531,7 @@ const i18n={
     imgPosTop:'Top', imgPosCenter:'Center', imgPosBottom:'Bottom', imgPosBg:'Background',
     btnPreview:'Refresh Preview', btnSingle:'Single-side Print', btnDuplex:'Duplex Print',
     btnPdfSingle:'Save PDF (single)', btnPdfDuplex:'Save PDF (duplex)', btnClear:'Clear',
-    btnEditText:'Edit Text', btnDelete:'Delete',
+    btnEditText:'Edit Text', btnDelete:'Delete', btnImgSelect:'Select Image',
     pdfHint:'⚠ PDF: In print dialog, change "Destination" to "Save as PDF". Compatible with convenience store printing.',
     bannerPlaceholder:'+ Add banner image (SNS header etc.)',
     imgCopyright:'⚠ Please check copyright — even for personal use, please verify permission from the rights holder.',
@@ -752,8 +754,11 @@ function applyLang(){
   // テキスト編集ボタン
   document.getElementById('editTextBtn').textContent=t.btnEditText;
   // 画像削除ボタン
-  const delBtn=document.querySelector('#imgSettingsPanel .sm-btn');
-  if(delBtn)delBtn.textContent=t.btnDelete;
+  // 画像削除ボタン（imgSelectBtnではない方）
+  document.querySelectorAll('#imgSettingsPanel .sm-btn').forEach(b=>{
+    if(b.id==='imgSelectBtn') return;
+    b.textContent=t.btnDelete;
+  });
   // パネルサマリー
   document.querySelector('#textSettingsPanel .panel-summary').textContent=t.panelText;
   document.querySelectorAll('.panel-details').forEach(d=>{
