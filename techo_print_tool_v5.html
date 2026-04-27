@@ -144,6 +144,7 @@ button:hover { background: #f5f5f5; }
       <button class="tog" onclick="setMode('todo')">Todo</button>
       <button class="tog" onclick="setMode('reading')">読書カード</button>
       <button class="tog" onclick="setMode('expense')">支出トラッカー</button>
+      <button class="tog" onclick="setMode('timetable')">時間割</button>
     </div>
   </div>
 
@@ -255,6 +256,18 @@ button:hover { background: #f5f5f5; }
   <!-- 支出トラッカーモード -->
   <div id="expenseSection" style="display:none;">
     <p class="note">日付・項目・金額の記入欄。日々の支出管理に。</p>
+  </div>
+
+  <!-- 時間割モード -->
+  <div id="timetableSection" style="display:none;">
+    <div class="row">
+      <span class="label" data-i18n="lblTtLabel">表記</span>
+      <div class="tog-group" id="ttLabelGroup">
+        <button class="tog active" onclick="setSetting('ttLabel','kanji')">漢字</button>
+        <button class="tog" onclick="setSetting('ttLabel','hira')">ひらがな</button>
+      </div>
+    </div>
+    <p class="note" data-i18n="noteTimetable">月〜金×6時間の時間割表。手書きで科目を記入して使えます。</p>
   </div>
 
   <!-- ハビットトラッカーモード -->
@@ -437,7 +450,7 @@ button:hover { background: #f5f5f5; }
 </div>
 
 <script>
-const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', cutGuide: 'trim', uiLang: 'ja', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
+const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', cutGuide: 'trim', uiLang: 'ja', ttLabel: 'kanji', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
 let textChunks=[]; // テキストモード用：分割済みチャンク配列
 
 const i18n={
@@ -452,7 +465,7 @@ const i18n={
     lblImage:'画像', lblImgAlpha:'濃さ', lblImgSize:'サイズ', lblImgPos:'位置',
     lblMove:'移動', lblRotate:'回転', lblStartMonth:'開始年月', lblLang:'言語',
     modeText:'テキスト', modeCal:'月間カレンダー', modeWeekly:'週間バーチカル',
-    modeTodo:'Todo', modeReading:'読書カード', modeExpense:'支出トラッカー',
+    modeTodo:'Todo', modeReading:'読書カード', modeExpense:'支出トラッカー', modeTimetable:'時間割',
     dirH:'横書き', dirV:'縦書き',
     alignL:'左', alignC:'中央', alignR:'右',
     calSimple:'シンプル', calGrid:'グリッド（枠付き）',
@@ -489,6 +502,7 @@ const i18n={
     sizeM5v:'Micro5 縦', sizeM5h:'Micro5 横', sizeM6v:'M6 縦', sizeM6h:'M6 横', sizeBible:'バイブル', sizeA4:'A4',
     calInfoTpl:'片面{n}ヶ月 / 両面{n2}ヶ月',
     bindShort:'⚠ 両面印刷時は必ず「短辺綴じ」を選択してください',
+    bindLong:'⚠ 両面印刷時は必ず「長辺綴じ」を選択してください',
     bindA4:'ℹ A4サイズは片面印刷のみ対応',
     bindBg:'⚠ 画像・方眼を印刷する場合：ブラウザの印刷設定で「背景のグラフィックス」をONにしてください',
     pageTpl:'ページ {c} / {t}',
@@ -501,6 +515,11 @@ const i18n={
     readFields:['タイトル:','著者:','読了日:','評価: ☆☆☆☆☆',''],
     readMemo:'メモ',
     expDate:'日付', expItem:'項目', expAmount:'金額',
+    lblTtLabel:'表記', ttKanji:'漢字', ttHira:'ひらがな',
+    noteTimetable:'月〜金×6時間の時間割表。手書きで科目を記入して使えます。',
+    ttDaysKanji:['月','火','水','木','金'],
+    ttDaysHira:['げつ','か','すい','もく','きん'],
+    ttPeriod:'時間',
   },
   en:{
     title:'Planner Refill A4 Print Tool v5',
@@ -513,7 +532,7 @@ const i18n={
     lblImage:'Image', lblImgAlpha:'Opacity', lblImgSize:'Size', lblImgPos:'Position',
     lblMove:'Move', lblRotate:'Rotate', lblStartMonth:'Start Month', lblLang:'Language',
     modeText:'Text', modeCal:'Monthly Calendar', modeWeekly:'Weekly Vertical',
-    modeTodo:'Todo', modeReading:'Reading Card', modeExpense:'Expense Tracker',
+    modeTodo:'Todo', modeReading:'Reading Card', modeExpense:'Expense Tracker', modeTimetable:'Timetable',
     dirH:'Horizontal', dirV:'Vertical',
     alignL:'Left', alignC:'Center', alignR:'Right',
     calSimple:'Simple', calGrid:'Grid (bordered)',
@@ -550,6 +569,7 @@ const i18n={
     sizeM5v:'Micro5 V', sizeM5h:'Micro5 H', sizeM6v:'M6 V', sizeM6h:'M6 H', sizeBible:'Bible', sizeA4:'A4',
     calInfoTpl:'{n} months/side — {n2} months duplex',
     bindShort:'⚠ For duplex printing, always select "Short-edge binding"',
+    bindLong:'⚠ For duplex printing, always select "Long-edge binding"',
     bindA4:'ℹ A4 size supports single-side printing only',
     bindBg:'⚠ To print images/grid: enable "Background graphics" in browser print settings',
     pageTpl:'Page {c} / {t}',
@@ -562,6 +582,11 @@ const i18n={
     readFields:['Title:','Author:','Finished:','Rating: ☆☆☆☆☆',''],
     readMemo:'Notes',
     expDate:'Date', expItem:'Item', expAmount:'Amount',
+    lblTtLabel:'Labels', ttKanji:'Kanji', ttHira:'Hiragana',
+    noteTimetable:'Mon–Fri × 6 periods timetable. Write subjects by hand.',
+    ttDaysKanji:['Mon','Tue','Wed','Thu','Fri'],
+    ttDaysHira:['Mon','Tue','Wed','Thu','Fri'],
+    ttPeriod:'Period',
   }
 };
 
@@ -611,8 +636,8 @@ const SIZES = {
     mmW: 80, mmH: 127, mmHoleW: 10, mmHoleSize: '3.5mm', mmHolePad: '7mm',
     mmLineH: 8, mmLineStart: 12, mmFontSize: '7pt', mmLineHeight: '8mm',
     cardsPerSheet: 4, cols: 2, rows: 2,
-    bindType: 'short',
-    bindLabel: '両面印刷時：「短辺綴じ」を選択してください',
+    bindType: 'long',
+    bindLabel: '両面印刷時：「長辺綴じ」を選択してください',
   },
   m6h: {
     pw: 254, ph: 160, holeW: 20, holes: 6, holePad: 10, holeSize: 7,
@@ -697,7 +722,7 @@ function applyLang(){
     if(t[k]!==undefined) el.textContent=t[k];
   });
   // モードボタン
-  const modeKeys=['modeText','modeCal','modeWeekly','modeTodo','modeReading','modeExpense'];
+  const modeKeys=['modeText','modeCal','modeWeekly','modeTodo','modeReading','modeExpense','modeTimetable'];
   document.getElementById('modeGroup').querySelectorAll('.tog').forEach((b,i)=>{if(modeKeys[i])b.textContent=t[modeKeys[i]];});
   // サイズボタン
   const sizeKeys=['sizeM5v','sizeM5h','sizeM6v','sizeM6h','sizeBible','sizeA4'];
@@ -717,6 +742,9 @@ function applyLang(){
   // ハビットタイプ
   const habBtns=document.getElementById('habitTypeGroup').querySelectorAll('.tog');
   habBtns[0].textContent=t.habitGrid; habBtns[1].textContent=t.habitCircle;
+  // 時間割表記
+  const ttBtns=document.getElementById('ttLabelGroup');
+  if(ttBtns){const bs=ttBtns.querySelectorAll('.tog'); bs[0].textContent=t.ttKanji; bs[1].textContent=t.ttHira;}
   // 用紙
   const paperBtns=document.getElementById('paperGroup').querySelectorAll('.tog');
   paperBtns[0].textContent=t.paperRuled; paperBtns[1].textContent=t.paperGrid2; paperBtns[2].textContent=t.paperGrid5; paperBtns[3].textContent=t.paperBlank;
@@ -780,7 +808,7 @@ function applyLang(){
   document.querySelector('.modal-close-btn').textContent=t.modalDone;
   document.getElementById('modalTxt').placeholder=t.modalPlaceholder;
   // ノート
-  const noteMap={weeklySection:'noteWeekly',todoSection:'noteTodo',readingSection:'noteReading',expenseSection:'noteExpense',habitSection:'noteHabit'};
+  const noteMap={weeklySection:'noteWeekly',todoSection:'noteTodo',readingSection:'noteReading',expenseSection:'noteExpense',habitSection:'noteHabit',timetableSection:'noteTimetable'};
   for(const[id,key]of Object.entries(noteMap)){
     const n=document.querySelector('#'+id+' .note');
     if(n)n.textContent=t[key];
@@ -810,8 +838,8 @@ function applyLang(){
 
 function setMode(mode) {
   state.mode=mode;
-  const modes=['text','cal','weekly','todo','reading','expense'];
-  const sections=['textSection','calSection','weeklySection','todoSection','readingSection','expenseSection'];
+  const modes=['text','cal','weekly','todo','reading','expense','timetable'];
+  const sections=['textSection','calSection','weeklySection','todoSection','readingSection','expenseSection','timetableSection'];
   sections.forEach((id,i)=>{document.getElementById(id).style.display=modes[i]===mode?'':'none';});
   document.getElementById('paperRow').style.display=(mode==='text')?'':'none';
   document.getElementById('modeGroup').querySelectorAll('.tog').forEach((b,i)=>{
@@ -823,7 +851,7 @@ function setMode(mode) {
 
 function setSetting(key, val) {
   state[key]=val;
-  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',textAlign:'textAlignGroup',cutGuide:'cutGuideGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup'};
+  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',textAlign:'textAlignGroup',cutGuide:'cutGuideGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup',ttLabel:'ttLabelGroup'};
   const vals={
     size:['micro5v','micro5h','m6v','m6h','bible','a4'],
     dir:['h','v'],
@@ -839,6 +867,7 @@ function setSetting(key, val) {
     cutGuide:['trim','border'],
     holeAlpha:['0','0.15','0.35','0.6','1'],
     imgAlpha:['0.1','0.25','0.5','1'],
+    ttLabel:['kanji','hira'],
   };
   if(map[key]){
     document.getElementById(map[key]).querySelectorAll('.tog').forEach((b,i)=>{
@@ -862,7 +891,9 @@ function updateBindHint(){
   const s=SIZES[state.size];
   const L=i18n[state.uiLang];
   const lines=[];
-  if(s.bindType!=='none'){
+  if(s.bindType==='long'){
+    lines.push(L.bindLong);
+  } else if(s.bindType==='short'){
     lines.push(L.bindShort);
   } else {
     lines.push(L.bindA4);
@@ -1221,6 +1252,9 @@ function renderCardContentPx(s, cardData, cardIdx) {
   if(state.mode==='todo'){
     return renderTodoPx(s,cL,cT);
   }
+  if(state.mode==='timetable'){
+    return renderTimetablePx(s,cL,cT);
+  }
   // text
   return null; // handled separately
 }
@@ -1396,6 +1430,83 @@ function renderExpensePx(s,cL,cT){
   h+=`<div style="width:${((cols[0].w+cols[1].w)*(aW-4)).toFixed(0)}px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;font-weight:${fw};color:#333;">合計</div>`;
   h+=`<div style="width:${(cols[2].w*(aW-4)).toFixed(0)}px;border-left:0.5px solid ${getLC()};"></div>`;
   h+='</div></div>';
+  return h;
+}
+
+// ========== 時間割（プレビュー）==========
+function getTtDays(){
+  const L=i18n[state.uiLang];
+  return state.ttLabel==='hira'?L.ttDaysHira:L.ttDaysKanji;
+}
+function renderTimetablePx(s,cL,cT){
+  const ff=getFF(),fw=getFW(),lc=getLC(),lcl=getLClight();
+  const aW=s.pw-cL, aH=s.ph-cT;
+  const days=getTtDays();
+  const periods=6;
+  const pad=2;
+  const headerH=Math.max(14,aH*0.08);
+  const periodColW=Math.max(18,aW*0.1);
+  const cellW=Math.floor((aW-pad*2-periodColW)/days.length);
+  const cellH=Math.floor((aH-pad*2-headerH)/periods);
+  const fs=Math.max(5,s.fontSize*0.6);
+  const pfs=Math.max(5,s.fontSize*0.55);
+  const L=i18n[state.uiLang];
+
+  let h=`<div style="position:absolute;top:${cT+pad}px;left:${cL+pad}px;width:${periodColW+cellW*days.length}px;height:${headerH+cellH*periods}px;font-family:${ff};border:1px solid ${lc};">`;
+  // ヘッダー行（左上空セル + 曜日）
+  h+=`<div style="display:flex;height:${headerH}px;border-bottom:1px solid ${lc};background:rgba(245,243,239,0.85);">`;
+  h+=`<div style="width:${periodColW}px;display:flex;align-items:center;justify-content:center;font-size:${pfs}px;font-weight:${fw};color:#888;border-right:1px solid ${lc};">${L.ttPeriod}</div>`;
+  days.forEach(d=>{
+    h+=`<div style="width:${cellW}px;display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:bold;color:#333;border-right:0.5px solid ${lcl};">${d}</div>`;
+  });
+  h+='</div>';
+  // 時間行
+  for(let p=1;p<=periods;p++){
+    h+=`<div style="display:flex;height:${cellH}px;border-bottom:${p<periods?'0.5px solid '+lcl:'none'};">`;
+    h+=`<div style="width:${periodColW}px;display:flex;align-items:center;justify-content:center;font-size:${pfs}px;font-weight:${fw};color:#555;border-right:1px solid ${lc};">${p}</div>`;
+    days.forEach(()=>{
+      h+=`<div style="width:${cellW}px;border-right:0.5px solid ${lcl};"></div>`;
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+// ========== 時間割（印刷）==========
+function renderTimetablePrintHTML(s){
+  const ff=getFF(),fw=getFW(),lc=getLC(),lcl=getLClight();
+  const isTop=s.holeDir==='top';
+  const cL=isTop?0:s.mmHoleW, cT=isTop?s.mmHoleW:0;
+  const aW=s.mmW-cL, aH=s.mmH-cT;
+  const days=getTtDays();
+  const periods=6;
+  const pad=1;
+  const headerH=Math.max(4,aH*0.08).toFixed(1);
+  const periodColW=Math.max(6,aW*0.1).toFixed(1);
+  const cellW=((aW-pad*2-parseFloat(periodColW))/days.length).toFixed(2);
+  const cellH=((aH-pad*2-parseFloat(headerH))/periods).toFixed(2);
+  const fs=parseFloat(s.mmFontSize)*0.85;
+  const pfs=parseFloat(s.mmFontSize)*0.75;
+  const L=i18n[state.uiLang];
+
+  let h=`<div style="position:absolute;top:${cT+pad}mm;left:${cL+pad}mm;width:${(parseFloat(periodColW)+parseFloat(cellW)*days.length).toFixed(2)}mm;height:${(parseFloat(headerH)+parseFloat(cellH)*periods).toFixed(2)}mm;font-family:${ff};border:0.4pt solid ${lc};">`;
+  // ヘッダー行
+  h+=`<div style="display:flex;height:${headerH}mm;border-bottom:0.4pt solid ${lc};background:#f5f3ef;">`;
+  h+=`<div style="width:${periodColW}mm;display:flex;align-items:center;justify-content:center;font-size:${pfs}pt;font-weight:${fw};color:#888;border-right:0.4pt solid ${lc};">${L.ttPeriod}</div>`;
+  days.forEach(d=>{
+    h+=`<div style="width:${cellW}mm;display:flex;align-items:center;justify-content:center;font-size:${fs}pt;font-weight:bold;color:#333;border-right:0.2pt solid ${lcl};">${d}</div>`;
+  });
+  h+='</div>';
+  for(let p=1;p<=periods;p++){
+    h+=`<div style="display:flex;height:${cellH}mm;border-bottom:${p<periods?'0.2pt solid '+lcl:'none'};">`;
+    h+=`<div style="width:${periodColW}mm;display:flex;align-items:center;justify-content:center;font-size:${pfs}pt;font-weight:${fw};color:#555;border-right:0.4pt solid ${lc};">${p}</div>`;
+    days.forEach(()=>{
+      h+=`<div style="width:${cellW}mm;border-right:0.2pt solid ${lcl};"></div>`;
+    });
+    h+='</div>';
+  }
+  h+='</div>';
   return h;
 }
 
@@ -1812,6 +1923,25 @@ function buildCardPrintHTML(s,data,dataIdxMap,isBack){
     else if(state.mode==='todo') inner=renderTodoPrintHTML(s);
     else if(state.mode==='reading') inner=renderReadingPrintHTML(s);
     else if(state.mode==='expense') inner=renderExpensePrintHTML(s);
+    else if(state.mode==='timetable'){
+      inner=renderTimetablePrintHTML(s);
+      if(state.imgData){
+        const cW=s.mmW-cL, cH=s.mmH-cT;
+        const sz=parseInt(state.imgSize)/100;
+        const iW=(cW*sz).toFixed(1), iH=(cH*sz).toFixed(1);
+        const dxMm=(state.imgDragX/2).toFixed(2), dyMm=(state.imgDragY/2).toFixed(2);
+        const printRotCSS=state.imgRotate?`transform:rotate(${state.imgRotate}deg);`:'';
+        if(state.imgPos==='bg'){
+          inner=`<img src="${state.imgData}" style="position:absolute;top:${cT}mm;left:${cL}mm;width:${cW}mm;height:${cH}mm;object-fit:cover;opacity:${state.imgAlpha};${printRotCSS}">`+inner;
+        } else {
+          const baseY=state.imgPos==='top'?cT:state.imgPos==='center'?(cT+(cH-cH*sz)/2):(cH-cH*sz+cT);
+          const baseX=state.imgPos==='center'?(cL+(cW-cW*sz)/2):cL;
+          const finalY=(baseY+parseFloat(dyMm)).toFixed(2);
+          const finalX=(baseX+parseFloat(dxMm)).toFixed(2);
+          inner+=`<img src="${state.imgData}" style="position:absolute;top:${finalY}mm;left:${finalX}mm;width:${iW}mm;height:${iH}mm;object-fit:contain;opacity:${state.imgAlpha};${printRotCSS}">`;
+        }
+      }
+    }
     else if(state.mode==='habit') inner=renderHabitPrintHTML(s);
     else {
       const text=data[di]||'';
@@ -1919,6 +2049,28 @@ function updatePreview(){
       card.innerHTML+=renderExpensePx(s,isTop?0:s.holeW,isTop?s.holeW:0);
     } else if(state.mode==='habit'){
       card.innerHTML+=renderHabitPx(s,isTop?0:s.holeW,isTop?s.holeW:0);
+    } else if(state.mode==='timetable'){
+      // 画像を背面レイヤーに
+      if(state.imgData){
+        const bgL=isTop?0:s.holeW, bgT=isTop?s.holeW:0;
+        const contentW=s.pw-bgL, contentH=s.ph-bgT;
+        const img=document.createElement('img');img.src=state.imgData;img.draggable=false;
+        const sz=parseInt(state.imgSize)/100;
+        const iW=contentW*sz, iH=contentH*sz;
+        const posMap={top:`top:${bgT}px;left:${bgL}px;`,center:`top:${bgT+(contentH-iH)/2}px;left:${bgL+(contentW-iW)/2}px;`,bottom:`bottom:0;left:${bgL}px;`,bg:`top:${bgT}px;left:${bgL}px;`};
+        const rotCSS=state.imgRotate?`rotate(${state.imgRotate}deg)`:'';
+        const dragTransform=state.imgPos!=='bg'?`transform:translate(${state.imgDragX}px,${state.imgDragY}px)${rotCSS?' '+rotCSS:''};cursor:grab;`:(rotCSS?`transform:${rotCSS};`:'');
+        if(state.imgPos==='bg'){
+          img.style.cssText=`position:absolute;${posMap.bg}width:${contentW}px;height:${contentH}px;object-fit:cover;opacity:${state.imgAlpha};pointer-events:none;z-index:1;${dragTransform}`;
+        } else {
+          img.style.cssText=`position:absolute;${posMap[state.imgPos]}width:${iW}px;height:${iH}px;object-fit:contain;opacity:${state.imgAlpha};${dragTransform}z-index:1;pointer-events:none;`;
+        }
+        card.appendChild(img);
+      }
+      const ttWrap=document.createElement('div');
+      ttWrap.style.cssText='position:relative;z-index:2;width:100%;height:100%;';
+      ttWrap.innerHTML=renderTimetablePx(s,isTop?0:s.holeW,isTop?s.holeW:0);
+      card.appendChild(ttWrap);
     } else {
       // テキストモード: ページ送り対応（表面のみ表示）
       const bgL=isTop?0:s.holeW,bgT=isTop?s.holeW:0;
