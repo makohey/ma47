@@ -18,6 +18,7 @@ h1 { font-size: 15px; font-weight: 500; margin: 0 0 4px; color: #333; }
   background: white; cursor: pointer; color: #333; white-space: nowrap;
 }
 .tog.active { background: #333; color: white; border-color: #333; }
+.tog.locked-mode { opacity: 0.4; cursor: not-allowed; background: #f0f0f0; color: #aaa; border-color: #ddd; pointer-events: none; }
 /* 折りたたみパネル */
 .panel-details { margin-bottom: 8px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
 .panel-summary { font-size: 13px; font-weight: 600; color: #444; padding: 8px 12px; cursor: pointer; background: #f8f8f8; list-style: none; user-select: none; }
@@ -113,7 +114,8 @@ button:hover { background: #f5f5f5; }
 
 <h1 data-i18n="title">手帳リフィル A4印刷ツール v5</h1>
 <p class="sub" data-i18n="subtitle">Micro5 / M6 / バイブル / A4 ／ テキスト・カレンダー・週間バーチカル・Todo</p>
-<p style="font-size:12px;color:#d00;font-weight:bold;margin:0 0 8px;padding:6px 10px;background:#fff3f3;border:1px solid #fcc;border-radius:6px;" data-i18n="winOnly">⚠ Windows PC専用（Chrome / Edge推奨）｜iPhone・iPadでの使用はできません</p>
+<p style="font-size:12px;color:#d00;font-weight:bold;margin:0 0 4px;padding:6px 10px;background:#fff3f3;border:1px solid #fcc;border-radius:6px;" data-i18n="winOnly">⚠ Windows PC専用（Chrome / Edge推奨）｜iPhone・iPadでの使用はできません</p>
+<p style="font-size:11px;color:#885500;margin:0 0 8px;padding:5px 10px;background:#fff8ee;border:1px solid #eed8a0;border-radius:6px;" data-i18n="printNote">※ プリンターの機種や設定により、罫線・方眼の細い線が乱れる場合があります。気になる場合は線の濃さを調整してください。</p>
 
 <div class="controls">
 
@@ -145,6 +147,8 @@ button:hover { background: #f5f5f5; }
       <button class="tog" onclick="setMode('reading')">読書カード</button>
       <button class="tog" onclick="setMode('expense')">支出トラッカー</button>
       <button class="tog" onclick="setMode('timetable')">時間割</button>
+      <button class="tog locked-mode" disabled title="Coming Soon">フロー 🔒</button>
+      <button class="tog locked-mode" disabled title="Coming Soon">マインドマップ 🔒</button>
     </div>
   </div>
 
@@ -214,6 +218,19 @@ button:hover { background: #f5f5f5; }
     </div>
   </div>
 
+  <!-- フロー入力モーダル -->
+  <div id="flowModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1002;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:12px;padding:16px;width:360px;max-width:90vw;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+      <h3 style="margin:0 0 8px;" data-i18n="flowModalTitle">フロー入力</h3>
+      <p style="font-size:12px;color:#888;margin:0 0 8px;" data-i18n="flowModalHint">1行ごとにボックスと矢印が自動生成されます</p>
+      <textarea id="flowTxt" style="width:100%;height:150px;box-sizing:border-box;font-size:13px;border:1px solid #ccc;border-radius:6px;padding:8px;" placeholder="ステップ1&#10;ステップ2&#10;ステップ3"></textarea>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
+        <button onclick="closeFlowModal()" style="padding:6px 14px;border:1px solid #ccc;border-radius:6px;background:#f5f5f5;cursor:pointer;" data-i18n="modalClear">クリア</button>
+        <button onclick="saveFlowModal()" style="padding:6px 14px;border:none;border-radius:6px;background:#1a73e8;color:white;cursor:pointer;" data-i18n="modalDone">入力完了</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 月間カレンダーモード -->
   <div id="calSection" style="display:none;">
     <div class="row">
@@ -268,6 +285,23 @@ button:hover { background: #f5f5f5; }
       </div>
     </div>
     <p class="note" data-i18n="noteTimetable">月〜金×6時間の時間割表。手書きで科目を記入して使えます。</p>
+  </div>
+
+  <!-- フローモード -->
+  <div id="flowSection" style="display:none;">
+    <div class="row">
+      <span class="label" data-i18n="lblFlowColor">ノード色</span>
+      <div class="tog-group" id="flowColorGroup">
+        <button class="tog active" onclick="setSetting('flowColor','blue')" style="background:#e3f0ff;border-color:#4a8fd4;color:#1a5ea8;">青</button>
+        <button class="tog" onclick="setSetting('flowColor','green')" style="background:#e6f5e6;border-color:#4a9e4a;color:#2d7a2d;">緑</button>
+        <button class="tog" onclick="setSetting('flowColor','orange')" style="background:#fff3e0;border-color:#e0912a;color:#b06a10;">橙</button>
+        <button class="tog" onclick="setSetting('flowColor','pink')" style="background:#fce4ec;border-color:#d44a6a;color:#b03050;">桃</button>
+        <button class="tog" onclick="setSetting('flowColor','gray')" style="background:#f0f0f0;border-color:#888;color:#555;">灰</button>
+      </div>
+    </div>
+    <button class="sm-btn" id="flowEditBtn" onclick="openFlowModal()" style="margin:6px 0;" data-i18n="btnFlowEdit">フロー入力・編集</button>
+    <button class="sm-btn" id="flowBranchBtn" onclick="addFlowBranch()" style="margin:6px 4px;" data-i18n="btnFlowBranch">分岐を追加</button>
+    <p class="note" data-i18n="noteFlow">改行で自動的にボックスと矢印が生成されます。分岐は個別に追加できます。</p>
   </div>
 
   <!-- ハビットトラッカーモード -->
@@ -450,7 +484,8 @@ button:hover { background: #f5f5f5; }
 </div>
 
 <script>
-const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', cutGuide: 'trim', uiLang: 'ja', ttLabel: 'kanji', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
+const state = { size: 'micro5v', dir: 'h', imgData: null, mode: 'text', paper: 'ruled', dayLang: 'ja', font: 'gothic', weight: 'bold', habitType: 'weekly', weeklyStyle: 'horizontal', calStyle: 'simple', textAlign: 'left', cutGuide: 'trim', uiLang: 'ja', ttLabel: 'kanji', flowColor: 'blue', lineAlpha: '0.35', holeAlpha: '0.35', imgAlpha: '1', imgSize: '75', imgPos: 'top', imgDragX: 0, imgDragY: 0, imgRotate: 0, fontScale: '1', currentPage: 0 };
+let flowNodes=[];  // [{text,branches:[{text,color}]}]
 let textChunks=[]; // テキストモード用：分割済みチャンク配列
 
 const i18n={
@@ -458,6 +493,7 @@ const i18n={
     title:'手帳リフィル A4印刷ツール v5',
     subtitle:'Micro5 / M6 / バイブル / A4 ／ テキスト・カレンダー・週間バーチカル・Todo',
     winOnly:'⚠ Windows PC専用（Chrome / Edge推奨）｜iPhone・iPadでの使用はできません',
+    printNote:'※ プリンターの機種や設定により、罫線・方眼の細い線が乱れる場合があります。気になる場合は線の濃さを調整してください。',
     lblMode:'モード', lblSize:'サイズ', lblDir:'書き方向', lblAlign:'配置',
     lblText:'テキスト', lblStyle:'スタイル', lblLayout:'レイアウト', lblPeriod:'期間',
     lblPaper:'用紙', lblFont:'フォント', lblWeight:'太さ', lblFontSize:'文字サイズ',
@@ -465,7 +501,7 @@ const i18n={
     lblImage:'画像', lblImgAlpha:'濃さ', lblImgSize:'サイズ', lblImgPos:'位置',
     lblMove:'移動', lblRotate:'回転', lblStartMonth:'開始年月', lblLang:'言語',
     modeText:'テキスト', modeCal:'月間カレンダー', modeWeekly:'週間バーチカル',
-    modeTodo:'Todo', modeReading:'読書カード', modeExpense:'支出トラッカー', modeTimetable:'時間割',
+    modeTodo:'Todo', modeReading:'読書カード', modeExpense:'支出トラッカー', modeTimetable:'時間割', modeFlow:'フロー', modeMindmap:'マインドマップ',
     dirH:'横書き', dirV:'縦書き',
     alignL:'左', alignC:'中央', alignR:'右',
     calSimple:'シンプル', calGrid:'グリッド（枠付き）',
@@ -517,6 +553,11 @@ const i18n={
     expDate:'日付', expItem:'項目', expAmount:'金額',
     lblTtLabel:'表記', ttKanji:'漢字', ttHira:'ひらがな',
     noteTimetable:'月〜金×6時間の時間割表。手書きで科目を記入して使えます。',
+    noteFlow:'改行で自動的にボックスと矢印が生成されます。分岐は個別に追加できます。',
+    lblFlowColor:'ノード色', btnFlowEdit:'フロー入力・編集', btnFlowBranch:'分岐を追加',
+    flowModalTitle:'フロー入力', flowModalHint:'1行ごとにボックスと矢印が自動生成されます',
+    flowPlaceholder:'ステップ1\nステップ2\nステップ3',
+    flowColorBlue:'青', flowColorGreen:'緑', flowColorOrange:'橙', flowColorPink:'桃', flowColorGray:'灰',
     ttDaysKanji:['月','火','水','木','金'],
     ttDaysHira:['げつ','か','すい','もく','きん'],
     ttPeriod:'時間',
@@ -525,6 +566,7 @@ const i18n={
     title:'Planner Refill A4 Print Tool v5',
     subtitle:'Micro5 / M6 / Bible / A4 — Text, Calendar, Weekly Vertical, Todo',
     winOnly:'⚠ Windows PC only (Chrome / Edge recommended) | Not available on iPhone or iPad',
+    printNote:'* Depending on your printer model and settings, fine lines (ruled/grid) may appear uneven. Adjust line opacity if needed.',
     lblMode:'Mode', lblSize:'Size', lblDir:'Direction', lblAlign:'Align',
     lblText:'Text', lblStyle:'Style', lblLayout:'Layout', lblPeriod:'Period',
     lblPaper:'Paper', lblFont:'Font', lblWeight:'Weight', lblFontSize:'Font Size',
@@ -532,7 +574,7 @@ const i18n={
     lblImage:'Image', lblImgAlpha:'Opacity', lblImgSize:'Size', lblImgPos:'Position',
     lblMove:'Move', lblRotate:'Rotate', lblStartMonth:'Start Month', lblLang:'Language',
     modeText:'Text', modeCal:'Monthly Calendar', modeWeekly:'Weekly Vertical',
-    modeTodo:'Todo', modeReading:'Reading Card', modeExpense:'Expense Tracker', modeTimetable:'Timetable',
+    modeTodo:'Todo', modeReading:'Reading Card', modeExpense:'Expense Tracker', modeTimetable:'Timetable', modeFlow:'Flow', modeMindmap:'Mindmap',
     dirH:'Horizontal', dirV:'Vertical',
     alignL:'Left', alignC:'Center', alignR:'Right',
     calSimple:'Simple', calGrid:'Grid (bordered)',
@@ -584,6 +626,11 @@ const i18n={
     expDate:'Date', expItem:'Item', expAmount:'Amount',
     lblTtLabel:'Labels', ttKanji:'Kanji', ttHira:'Hiragana',
     noteTimetable:'Mon–Fri × 6 periods timetable. Write subjects by hand.',
+    noteFlow:'Each line becomes a box with connecting arrows. Add branches individually.',
+    lblFlowColor:'Node Color', btnFlowEdit:'Edit Flow', btnFlowBranch:'Add Branch',
+    flowModalTitle:'Flow Input', flowModalHint:'Each line creates a box with an arrow below',
+    flowPlaceholder:'Step 1\nStep 2\nStep 3',
+    flowColorBlue:'Blue', flowColorGreen:'Green', flowColorOrange:'Orange', flowColorPink:'Pink', flowColorGray:'Gray',
     ttDaysKanji:['Mon','Tue','Wed','Thu','Fri'],
     ttDaysHira:['Mon','Tue','Wed','Thu','Fri'],
     ttPeriod:'Period',
@@ -722,8 +769,15 @@ function applyLang(){
     if(t[k]!==undefined) el.textContent=t[k];
   });
   // モードボタン
-  const modeKeys=['modeText','modeCal','modeWeekly','modeTodo','modeReading','modeExpense','modeTimetable'];
-  document.getElementById('modeGroup').querySelectorAll('.tog').forEach((b,i)=>{if(modeKeys[i])b.textContent=t[modeKeys[i]];});
+  const modeKeys=['modeText','modeCal','modeWeekly','modeTodo','modeReading','modeExpense','modeTimetable','modeFlow','modeMindmap'];
+  document.getElementById('modeGroup').querySelectorAll('.tog').forEach((b,i)=>{
+    if(!modeKeys[i])return;
+    if(b.classList.contains('locked-mode')){
+      b.textContent=(t[modeKeys[i]]||modeKeys[i])+' \u{1F512}';
+    } else {
+      b.textContent=t[modeKeys[i]];
+    }
+  });
   // サイズボタン
   const sizeKeys=['sizeM5v','sizeM5h','sizeM6v','sizeM6h','sizeBible','sizeA4'];
   document.getElementById('sizeGroup').querySelectorAll('.tog').forEach((b,i)=>{if(sizeKeys[i])b.textContent=t[sizeKeys[i]];});
@@ -808,7 +862,7 @@ function applyLang(){
   document.querySelector('.modal-close-btn').textContent=t.modalDone;
   document.getElementById('modalTxt').placeholder=t.modalPlaceholder;
   // ノート
-  const noteMap={weeklySection:'noteWeekly',todoSection:'noteTodo',readingSection:'noteReading',expenseSection:'noteExpense',habitSection:'noteHabit',timetableSection:'noteTimetable'};
+  const noteMap={weeklySection:'noteWeekly',todoSection:'noteTodo',readingSection:'noteReading',expenseSection:'noteExpense',habitSection:'noteHabit',timetableSection:'noteTimetable',flowSection:'noteFlow'};
   for(const[id,key]of Object.entries(noteMap)){
     const n=document.querySelector('#'+id+' .note');
     if(n)n.textContent=t[key];
@@ -838,11 +892,12 @@ function applyLang(){
 
 function setMode(mode) {
   state.mode=mode;
+  state.currentPage=0;
   const modes=['text','cal','weekly','todo','reading','expense','timetable'];
   const sections=['textSection','calSection','weeklySection','todoSection','readingSection','expenseSection','timetableSection'];
   sections.forEach((id,i)=>{document.getElementById(id).style.display=modes[i]===mode?'':'none';});
   document.getElementById('paperRow').style.display=(mode==='text')?'':'none';
-  document.getElementById('modeGroup').querySelectorAll('.tog').forEach((b,i)=>{
+  document.getElementById('modeGroup').querySelectorAll('.tog:not(.locked-mode)').forEach((b,i)=>{
     b.classList.toggle('active',modes[i]===mode);
   });
   updateCalInfo();
@@ -851,7 +906,7 @@ function setMode(mode) {
 
 function setSetting(key, val) {
   state[key]=val;
-  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',textAlign:'textAlignGroup',cutGuide:'cutGuideGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup',ttLabel:'ttLabelGroup'};
+  const map={size:'sizeGroup',dir:'dirGroup',paper:'paperGroup',dayLang:'dayLangGroup',font:'fontGroup',weight:'weightGroup',fontScale:'fontScaleGroup',habitType:'habitTypeGroup',weeklyStyle:'weeklyStyleGroup',calStyle:'calStyleGroup',textAlign:'textAlignGroup',cutGuide:'cutGuideGroup',holeAlpha:'holeAlphaGroup',imgAlpha:'imgAlphaGroup',ttLabel:'ttLabelGroup',flowColor:'flowColorGroup'};
   const vals={
     size:['micro5v','micro5h','m6v','m6h','bible','a4'],
     dir:['h','v'],
@@ -868,6 +923,7 @@ function setSetting(key, val) {
     holeAlpha:['0','0.15','0.35','0.6','1'],
     imgAlpha:['0.1','0.25','0.5','1'],
     ttLabel:['kanji','hira'],
+    flowColor:['blue','green','orange','pink','gray'],
   };
   if(map[key]){
     document.getElementById(map[key]).querySelectorAll('.tog').forEach((b,i)=>{
@@ -995,16 +1051,22 @@ function splitTextIntoChunks(text,s){
 function changePage(delta){
   const s=SIZES[state.size];
   const n=s.cardsPerSheet;
-  const totalPages=Math.ceil(textChunks.length/n);
+  let totalItems=0;
+  if(state.mode==='text') totalItems=textChunks.length;
+  else if(state.mode==='flow') totalItems=flowCards.length;
+  const totalPages=Math.max(1,Math.ceil(totalItems/n));
   state.currentPage=Math.max(0,Math.min(totalPages-1,state.currentPage+delta));
   updatePreview();
 }
 function updatePageNav(){
   const s=SIZES[state.size];
   const n=s.cardsPerSheet;
-  const totalPages=Math.max(1,Math.ceil(textChunks.length/n));
+  let totalItems=0;
+  if(state.mode==='text') totalItems=textChunks.length;
+  else if(state.mode==='flow') totalItems=flowCards.length;
+  const totalPages=Math.max(1,Math.ceil(totalItems/n));
   const nav=document.getElementById('pageNav');
-  const show=state.mode==='text'&&textChunks.length>n;
+  const show=(state.mode==='text'||state.mode==='flow')&&totalItems>n;
   nav.style.display=show?'':'none';
   const L=i18n[state.uiLang];
   document.getElementById('pageIndicator').textContent=L.pageTpl.replace('{c}',state.currentPage+1).replace('{t}',totalPages);
@@ -1254,6 +1316,9 @@ function renderCardContentPx(s, cardData, cardIdx) {
   }
   if(state.mode==='timetable'){
     return renderTimetablePx(s,cL,cT);
+  }
+  if(state.mode==='flow'){
+    return renderFlowPx(s,cL,cT,cardIdx);
   }
   // text
   return null; // handled separately
@@ -1506,6 +1571,179 @@ function renderTimetablePrintHTML(s){
     });
     h+='</div>';
   }
+  h+='</div>';
+  return h;
+}
+
+// ========== フロー ==========
+const FLOW_COLORS={
+  blue:{bg:'#e3f0ff',border:'#4a8fd4',text:'#1a5ea8',arrow:'#4a8fd4'},
+  green:{bg:'#e6f5e6',border:'#4a9e4a',text:'#2d7a2d',arrow:'#4a9e4a'},
+  orange:{bg:'#fff3e0',border:'#e0912a',text:'#b06a10',arrow:'#e0912a'},
+  pink:{bg:'#fce4ec',border:'#d44a6a',text:'#b03050',arrow:'#d44a6a'},
+  gray:{bg:'#f0f0f0',border:'#888',text:'#444',arrow:'#888'}
+};
+
+function openFlowModal(){
+  const modal=document.getElementById('flowModal');
+  const txt=document.getElementById('flowTxt');
+  txt.value=flowNodes.map(n=>n.text).join('\n');
+  modal.style.display='flex';
+}
+function closeFlowModal(){document.getElementById('flowModal').style.display='none';}
+function saveFlowModal(){
+  const txt=document.getElementById('flowTxt').value;
+  const lines=txt.split('\n').map(l=>l.trim()).filter(Boolean);
+  // 既存の分岐を保持しつつノードを更新
+  const oldNodes=flowNodes.slice();
+  flowNodes=lines.map((text,i)=>{
+    const old=oldNodes[i];
+    return {text, color:state.flowColor, branches:old&&old.text===text?old.branches:[]};
+  });
+  flowCards=splitFlowIntoCards(SIZES[state.size]);
+  closeFlowModal();
+  updatePreview();
+}
+function addFlowBranch(){
+  if(flowNodes.length===0){alert(i18n[state.uiLang].flowModalHint);return;}
+  const idx=flowNodes.length>1?parseInt(prompt('どのノード？(1〜'+flowNodes.length+')',1))-1:0;
+  if(isNaN(idx)||idx<0||idx>=flowNodes.length)return;
+  const text=prompt('分岐テキスト','');
+  if(!text)return;
+  flowNodes[idx].branches.push({text,color:state.flowColor});
+  flowCards=splitFlowIntoCards(SIZES[state.size]);
+  updatePreview();
+}
+
+// フローをカードごとに分割（高さベース）
+function splitFlowIntoCards(s){
+  const isTop=s.holeDir==='top';
+  const aH=s.ph-(isTop?s.holeW:0);
+  const pad=6;
+  const baseStep=18; // ノード1個分の基本高さ（テキスト＋矢印）
+  const branchExtra=10; // 分岐1個あたりの追加高さ
+  const cards=[];
+  let current=[];
+  let usedH=pad;
+  for(let i=0;i<flowNodes.length;i++){
+    const node=flowNodes[i];
+    const nodeH=baseStep+Math.max(0,(node.branches?node.branches.length:0)-1)*branchExtra;
+    if(current.length>0 && usedH+nodeH>aH-pad){
+      cards.push(current);
+      current=[];
+      usedH=pad;
+    }
+    current.push(node);
+    usedH+=nodeH;
+  }
+  if(current.length>0) cards.push(current);
+  if(!cards.length) cards.push([]);
+  return cards;
+}
+let flowCards=[];
+
+function renderFlowPx(s,cL,cT,cardIdx){
+  const ff=getFF(),fw=getFW();
+  const aW=s.pw-cL, aH=s.ph-cT;
+  const nodes=(cardIdx!==undefined?flowCards[cardIdx]:flowCards[0])||[];
+  if(!nodes.length)return `<div style="position:absolute;top:${cT}px;left:${cL}px;right:0;bottom:0;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:12px;font-family:${ff};"></div>`;
+
+  const pad=4;
+  const nodeH=Math.max(12,Math.min(20,(aH-pad*2)/(nodes.length*1.8)));
+  const arrowH=Math.max(8,nodeH*0.6);
+  const fs=Math.max(6,Math.min(10,nodeH*0.55));
+  const bfs=Math.max(5,fs*0.85);
+  const nodeX=cL+pad+6;
+
+  let h=`<div style="position:absolute;top:${cT}px;left:${cL}px;width:${aW}px;height:${aH}px;font-family:${ff};">`;
+  let y=cT+pad;
+
+  nodes.forEach((node,i)=>{
+    const c=FLOW_COLORS[node.color]||FLOW_COLORS.blue;
+    // テキストのみ（枠なし）
+    h+=`<div style="position:absolute;top:${y}px;left:${nodeX}px;font-size:${fs}px;font-weight:${fw};color:${c.text};white-space:nowrap;">${esc(node.text)}</div>`;
+
+    // 分岐（右側に横矢印＋テキスト）
+    if(node.branches&&node.branches.length){
+      const mainTextW=Math.min(node.text.length*fs*0.7,aW*0.4);
+      node.branches.forEach((br,bi)=>{
+        const bc=FLOW_COLORS[br.color]||FLOW_COLORS.gray;
+        const bx=nodeX+mainTextW+8;
+        const by=y+bi*nodeH*0.7;
+        const arrowLen=10;
+        h+=`<div style="position:absolute;top:${by+nodeH/2-1}px;left:${bx}px;width:${arrowLen}px;height:0;border-top:1px solid ${bc.arrow};"></div>`;
+        h+=`<div style="position:absolute;top:${by+nodeH/2-3}px;left:${bx+arrowLen-1}px;width:0;height:0;border-left:4px solid ${bc.arrow};border-top:2.5px solid transparent;border-bottom:2.5px solid transparent;"></div>`;
+        h+=`<div style="position:absolute;top:${by}px;left:${bx+arrowLen+3}px;font-size:${bfs}px;color:${bc.text};white-space:nowrap;">${esc(br.text)}</div>`;
+      });
+    }
+
+    // 下向き矢印（最後のノード以外、またはカードが続く場合）
+    const isLastInCard=i===nodes.length-1;
+    const hasMore=cardIdx!==undefined&&cardIdx<flowCards.length-1;
+    if(!isLastInCard||hasMore){
+      const arrowX=nodeX+2;
+      const arrowY=y+nodeH-2;
+      const ac=FLOW_COLORS[node.color]||FLOW_COLORS.blue;
+      h+=`<div style="position:absolute;top:${arrowY}px;left:${arrowX-0.5}px;width:0;height:${arrowH-5}px;border-left:1.5px solid ${ac.arrow};"></div>`;
+      h+=`<div style="position:absolute;top:${arrowY+arrowH-6}px;left:${arrowX-3.5}px;width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-top:4.5px solid ${ac.arrow};"></div>`;
+    }
+
+    y+=nodeH+arrowH;
+  });
+
+  h+='</div>';
+  return h;
+}
+
+// ========== フロー（印刷）==========
+function renderFlowPrintHTML(s,cardIdx){
+  const ff=getFF(),fw=getFW();
+  const isTop=s.holeDir==='top';
+  const cL=isTop?0:s.mmHoleW, cT=isTop?s.mmHoleW:0;
+  const aW=s.mmW-cL, aH=s.mmH-cT;
+  const nodes=(cardIdx!==undefined?flowCards[cardIdx]:flowCards[0])||[];
+  if(!nodes.length)return '';
+
+  const pad=1.5;
+  const nodeH=Math.max(4,Math.min(7,(aH-pad*2)/(nodes.length*1.8)));
+  const arrowH=Math.max(2.5,nodeH*0.6);
+  const fs=Math.max(4,Math.min(6.5,nodeH*0.6));
+  const bfs=Math.max(3,fs*0.85);
+  const nodeX=cL+pad+2;
+
+  let h=`<div style="position:absolute;top:${cT}mm;left:${cL}mm;width:${aW}mm;height:${aH}mm;font-family:${ff};">`;
+  let y=cT+pad;
+
+  nodes.forEach((node,i)=>{
+    const c=FLOW_COLORS[node.color]||FLOW_COLORS.blue;
+    h+=`<div style="position:absolute;top:${y.toFixed(1)}mm;left:${nodeX.toFixed(1)}mm;font-size:${fs.toFixed(1)}pt;font-weight:${fw};color:${c.text};white-space:nowrap;">${esc(node.text)}</div>`;
+
+    if(node.branches&&node.branches.length){
+      const mainTextW=Math.min(node.text.length*fs*0.4,aW*0.4);
+      node.branches.forEach((br,bi)=>{
+        const bc=FLOW_COLORS[br.color]||FLOW_COLORS.gray;
+        const bx=nodeX+mainTextW+3;
+        const by=y+bi*nodeH*0.7;
+        const arrowLen=3;
+        h+=`<div style="position:absolute;top:${(by+nodeH/2-0.1).toFixed(1)}mm;left:${bx.toFixed(1)}mm;width:${arrowLen}mm;height:0;border-top:0.25pt solid ${bc.arrow};"></div>`;
+        h+=`<div style="position:absolute;top:${(by+nodeH/2-0.6).toFixed(1)}mm;left:${(bx+arrowLen-0.2).toFixed(1)}mm;width:0;height:0;border-left:1.2mm solid ${bc.arrow};border-top:0.6mm solid transparent;border-bottom:0.6mm solid transparent;"></div>`;
+        h+=`<div style="position:absolute;top:${by.toFixed(1)}mm;left:${(bx+arrowLen+0.8).toFixed(1)}mm;font-size:${bfs.toFixed(1)}pt;color:${bc.text};white-space:nowrap;">${esc(br.text)}</div>`;
+      });
+    }
+
+    const isLastInCard=i===nodes.length-1;
+    const hasMore=cardIdx!==undefined&&cardIdx<flowCards.length-1;
+    if(!isLastInCard||hasMore){
+      const arrowX=nodeX+0.8;
+      const arrowY=y+nodeH-0.5;
+      const ac=FLOW_COLORS[node.color]||FLOW_COLORS.blue;
+      h+=`<div style="position:absolute;top:${arrowY.toFixed(1)}mm;left:${(arrowX-0.1).toFixed(1)}mm;width:0;height:${(arrowH-1).toFixed(1)}mm;border-left:0.25pt solid ${ac.arrow};"></div>`;
+      h+=`<div style="position:absolute;top:${(arrowY+arrowH-1.3).toFixed(1)}mm;left:${(arrowX-0.9).toFixed(1)}mm;width:0;height:0;border-left:0.9mm solid transparent;border-right:0.9mm solid transparent;border-top:1.2mm solid ${ac.arrow};"></div>`;
+    }
+
+    y+=nodeH+arrowH;
+  });
+
   h+='</div>';
   return h;
 }
@@ -1942,6 +2180,25 @@ function buildCardPrintHTML(s,data,dataIdxMap,isBack){
         }
       }
     }
+    else if(state.mode==='flow'){
+      inner=renderFlowPrintHTML(s,data[di]);
+      if(state.imgData){
+        const cW=s.mmW-cL, cH=s.mmH-cT;
+        const sz=parseInt(state.imgSize)/100;
+        const iW=(cW*sz).toFixed(1), iH=(cH*sz).toFixed(1);
+        const dxMm=(state.imgDragX/2).toFixed(2), dyMm=(state.imgDragY/2).toFixed(2);
+        const printRotCSS=state.imgRotate?`transform:rotate(${state.imgRotate}deg);`:'';
+        if(state.imgPos==='bg'){
+          inner=`<img src="${state.imgData}" style="position:absolute;top:${cT}mm;left:${cL}mm;width:${cW}mm;height:${cH}mm;object-fit:cover;opacity:${state.imgAlpha};${printRotCSS}">`+inner;
+        } else {
+          const baseY=state.imgPos==='top'?cT:state.imgPos==='center'?(cT+(cH-cH*sz)/2):(cH-cH*sz+cT);
+          const baseX=state.imgPos==='center'?(cL+(cW-cW*sz)/2):cL;
+          const finalY=(baseY+parseFloat(dyMm)).toFixed(2);
+          const finalX=(baseX+parseFloat(dxMm)).toFixed(2);
+          inner+=`<img src="${state.imgData}" style="position:absolute;top:${finalY}mm;left:${finalX}mm;width:${iW}mm;height:${iH}mm;object-fit:contain;opacity:${state.imgAlpha};${printRotCSS}">`;
+        }
+      }
+    }
     else if(state.mode==='habit') inner=renderHabitPrintHTML(s);
     else {
       const text=data[di]||'';
@@ -1999,6 +2256,12 @@ function updatePreview(){
     const text=document.getElementById('txt').value||'';
     textChunks=splitTextIntoChunks(text,s);
     const totalPages=Math.ceil(textChunks.length/n);
+    if(state.currentPage>=totalPages) state.currentPage=Math.max(0,totalPages-1);
+    updatePageNav();
+  } else if(state.mode==='flow'){
+    // フローモード: カード分割＋ページング
+    flowCards=splitFlowIntoCards(s);
+    const totalPages=Math.max(1,Math.ceil(flowCards.length/n));
     if(state.currentPage>=totalPages) state.currentPage=Math.max(0,totalPages-1);
     updatePageNav();
   } else {
@@ -2071,6 +2334,29 @@ function updatePreview(){
       ttWrap.style.cssText='position:relative;z-index:2;width:100%;height:100%;';
       ttWrap.innerHTML=renderTimetablePx(s,isTop?0:s.holeW,isTop?s.holeW:0);
       card.appendChild(ttWrap);
+    } else if(state.mode==='flow'){
+      // 画像を背面レイヤーに
+      if(state.imgData){
+        const bgL=isTop?0:s.holeW, bgT=isTop?s.holeW:0;
+        const contentW=s.pw-bgL, contentH=s.ph-bgT;
+        const img=document.createElement('img');img.src=state.imgData;img.draggable=false;
+        const sz=parseInt(state.imgSize)/100;
+        const iW=contentW*sz, iH=contentH*sz;
+        const posMap={top:`top:${bgT}px;left:${bgL}px;`,center:`top:${bgT+(contentH-iH)/2}px;left:${bgL+(contentW-iW)/2}px;`,bottom:`bottom:0;left:${bgL}px;`,bg:`top:${bgT}px;left:${bgL}px;`};
+        const rotCSS=state.imgRotate?`rotate(${state.imgRotate}deg)`:'';
+        const dragTransform=state.imgPos!=='bg'?`transform:translate(${state.imgDragX}px,${state.imgDragY}px)${rotCSS?' '+rotCSS:''};cursor:grab;`:(rotCSS?`transform:${rotCSS};`:'');
+        if(state.imgPos==='bg'){
+          img.style.cssText=`position:absolute;${posMap.bg}width:${contentW}px;height:${contentH}px;object-fit:cover;opacity:${state.imgAlpha};pointer-events:none;z-index:1;${dragTransform}`;
+        } else {
+          img.style.cssText=`position:absolute;${posMap[state.imgPos]}width:${iW}px;height:${iH}px;object-fit:contain;opacity:${state.imgAlpha};${dragTransform}z-index:1;pointer-events:none;`;
+        }
+        card.appendChild(img);
+      }
+      const flowWrap=document.createElement('div');
+      flowWrap.style.cssText='position:relative;z-index:2;width:100%;height:100%;';
+      const flowIdx=state.currentPage*n+i;
+      flowWrap.innerHTML=renderFlowPx(s,isTop?0:s.holeW,isTop?s.holeW:0,flowIdx);
+      card.appendChild(flowWrap);
     } else {
       // テキストモード: ページ送り対応（表面のみ表示）
       const bgL=isTop?0:s.holeW,bgT=isTop?s.holeW:0;
@@ -2203,6 +2489,41 @@ function printPage(bothSides){
         for(let c=0;c<n;c++) pageData.push(chunks[pg*n+c]||'');
         const fm=Array.from({length:n},(_,i)=>i);
         allPages+=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,pageData,fm,false)}${getCutGuideAfterMm(s)}</div>`;
+      }
+    }
+    openPrintWindow(s,allPages);
+    return;
+  }
+
+  // フローモード: テキストと同様にカード分割＋複数ページ
+  if(state.mode==='flow'){
+    flowCards=splitFlowIntoCards(s);
+    let allPages='';
+    if(bothSides){
+      const totalCardsPerSheet=n*2;
+      const totalSheets=Math.max(1,Math.ceil(flowCards.length/totalCardsPerSheet));
+      const backPosMap=getBacksideOrderPaired(s);
+      for(let sheet=0;sheet<totalSheets;sheet++){
+        const base=sheet*totalCardsPerSheet;
+        // data配列: cardIdxをマッピング用に
+        const data=[];
+        for(let c=0;c<totalCardsPerSheet;c++) data.push(base+c);
+        // 表面: 偶数番目のカード
+        const frontMap=Array.from({length:n},(_,i)=>i*2);
+        // 裏面: ペアのマッピング
+        const backMap=backPosMap.map(fi=>fi*2+1);
+        // flowCardsの実インデックスを使うため、dataIdxMap→flowCardsのcardIdxとして使用
+        // buildCardPrintHTMLのdi=data[dataIdxMap[i]]がcardIdxになるように
+        allPages+=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,frontMap,false)}${getCutGuideAfterMm(s)}</div>`;
+        allPages+=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,backMap,true)}${getCutGuideAfterMm(s)}</div>`;
+      }
+    } else {
+      const totalPages=Math.max(1,Math.ceil(flowCards.length/n));
+      for(let pg=0;pg<totalPages;pg++){
+        const data=[];
+        for(let c=0;c<n;c++) data.push(pg*n+c);
+        const fm=Array.from({length:n},(_,i)=>i);
+        allPages+=`<div class="page">${getCutGuideBeforeMm(s)}${buildCardPrintHTML(s,data,fm,false)}${getCutGuideAfterMm(s)}</div>`;
       }
     }
     openPrintWindow(s,allPages);
